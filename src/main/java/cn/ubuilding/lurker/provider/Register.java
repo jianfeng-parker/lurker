@@ -1,5 +1,6 @@
 package cn.ubuilding.lurker.provider;
 
+import cn.ubuilding.lurker.provider.publish.DefaultPublisher;
 import cn.ubuilding.lurker.provider.publish.Publisher;
 
 import java.util.List;
@@ -9,21 +10,32 @@ import java.util.List;
  * @since 16/4/3 15:44
  */
 
-public class Register {
+public final class Register {
 
+    /**
+     * 用于启动RPC服务
+     */
     private Server server;
 
     /**
-     * 用于将服务信息发布到注册信息
+     * 用于将服务信息发布到注册中心
      */
     private Publisher publisher;
 
     /**
-     * RPC服务暴露的端口
+     * RPC服务端口
      */
     private int port;
 
-    private boolean ssl;
+    /**
+     * RPC服务地址
+     */
+    private String host;
+
+    /**
+     * RPC服务是否使用SSL，默认:false
+     */
+    private boolean useSSL = false;
 
     /**
      * RPC服务提供者列表
@@ -34,16 +46,16 @@ public class Register {
      * 注册逻辑执行入口
      */
     public void registry() {
-        if (null == providers || providers.size() == 0)
-            throw new RuntimeException("not found any providers to registry");
+        validate();// 验证参数
         try {
             if (server == null) {
-                server = new Server(providers);
+                server = new Server(providers, getPort());
             }
             server.start();// 启动服务
-            if (null != publisher) {
-                publisher.publish(providers); // 发布服务
+            if (null == publisher) {
+                publisher = new DefaultPublisher();
             }
+            publisher.publish(host, port, providers); // 发布服务
         } catch (Exception e) {
             System.out.println("registry  failure:" + e.getMessage());
         }
@@ -51,7 +63,19 @@ public class Register {
     }
 
     public int getPort() {
-        return port <= 0 ? 8899 : port;
+        return port;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public boolean isUseSSL() {
+        return useSSL;
+    }
+
+    public void setUseSSL(boolean useSSL) {
+        this.useSSL = useSSL;
     }
 
     public void setPort(int port) {
@@ -66,12 +90,28 @@ public class Register {
         this.providers = providers;
     }
 
-    public boolean isSsl() {
-        return ssl;
+    public void setHost(String host) {
+        this.host = host;
     }
 
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
+    public Publisher getPublisher() {
+        return publisher;
     }
 
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
+    }
+
+    private void validate() {
+        if (null == providers || providers.size() == 0) {
+            throw new IllegalArgumentException("not found any providers to registry");
+        }
+        if (this.port <= 0) {
+            throw new IllegalArgumentException("invalid port:" + this.port);
+        }
+        if (null == this.host || this.host.trim().length() == 0) {
+            throw new IllegalArgumentException("invalid host:" + this.host);
+        }
+
+    }
 }

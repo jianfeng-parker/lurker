@@ -1,5 +1,9 @@
 package cn.ubuilding.lurker.provider.publish;
 
+import cn.ubuilding.lurker.provider.Provider;
+
+import java.util.List;
+
 /**
  * @author Wu Jianfeng
  * @since 16/4/3 21:56
@@ -8,7 +12,7 @@ package cn.ubuilding.lurker.provider.publish;
  */
 
 public class RedisPublisher implements Publisher {
-    public void publish() {
+    public void publish(String host, int port, List<Provider> providers) {
 
     }
 }

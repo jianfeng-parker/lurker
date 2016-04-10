@@ -17,18 +17,6 @@ public class Request {
 
     private Object[] parameters;
 
-    public Request(String id, String serviceKey, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
-        this.id = id;
-        this.serviceKey = serviceKey;
-        this.methodName = methodName;
-        this.parameterTypes = parameterTypes;
-        this.parameters = parameters;
-    }
-
-    public Request(String serviceKey, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
-        this(null, serviceKey, methodName, parameterTypes, parameters);
-    }
-
     public String getId() {
         return id;
     }

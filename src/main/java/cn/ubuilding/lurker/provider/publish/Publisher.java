@@ -14,5 +14,5 @@ import java.util.List;
 
 public interface Publisher {
 
-    void publish(List<Provider> providers);
+    void publish(String host, int port, List<Provider> providers);
 }

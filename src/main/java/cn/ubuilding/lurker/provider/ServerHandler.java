@@ -17,14 +17,13 @@ import java.util.Map;
  * 处理客户端Channel的 Handler
  */
 
-public class ProviderHandler extends ChannelInboundHandlerAdapter {
+public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private static Map<String, Map<String, Object>> ThreadLocalMap = new HashMap<String, Map<String, Object>>();
 
     private final Map<String, Provider> handlerMap;
 
-
-    public ProviderHandler(Map<String, Provider> handlerMap) {
+    public ServerHandler(Map<String, Provider> handlerMap) {
         this.handlerMap = handlerMap;
     }
 

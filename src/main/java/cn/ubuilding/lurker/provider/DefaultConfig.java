@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.common;
+package cn.ubuilding.lurker.provider;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,21 +7,22 @@ import java.util.Properties;
 /**
  * @author Wu Jianfeng
  * @since 16/4/3 22:33
+ * 该类用于解析配置参数或提供默认参数
  */
 
-public final class LurkerConfig {
+public final class DefaultConfig {
 
     private Properties properties;
 
-    private static LurkerConfig config;
+    private static DefaultConfig config;
 
     private static final Object lock = new Object();
 
-    public static LurkerConfig getInstance() {
+    public static DefaultConfig getInstance() {
         if (config == null) {
             synchronized (lock) {
                 if (config == null) {
-                    config = new LurkerConfig();
+                    config = new DefaultConfig();
                 }
             }
         }
@@ -29,11 +30,31 @@ public final class LurkerConfig {
     }
 
 
+    /**
+     * 获取RPC服务端口
+     */
+    public int getPort() {
+        String portConfig = getProperty("rpc.port");
+        return null != portConfig ? Integer.parseInt(portConfig) : 8899;
+    }
+
+    public String getHost() {
+        String hostConfig = getProperty("rpc.host");
+        return null != hostConfig ? hostConfig : "";// TODO 使用默认服务发布地址
+    }
+
+    /**
+     * 服务是否使用SSL
+     */
+    public boolean isSSL() {
+        return null != getProperty("use.ssl") && Boolean.parseBoolean(getProperty("use.ssl"));
+    }
+
     public String getProperty(String name) {
         return properties.getProperty(name);
     }
 
-    private LurkerConfig() {
+    private DefaultConfig() {
         loadProperties("lurker.properties");
     }
 

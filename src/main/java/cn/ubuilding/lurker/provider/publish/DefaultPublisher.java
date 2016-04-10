@@ -13,7 +13,7 @@ import java.util.List;
 
 public class DefaultPublisher implements Publisher {
 
-    public void publish(List<Provider> providers) {
+    public void publish(String host, int port,List<Provider> providers) {
         // TODO 将服务发布到注册中心
         if (null == providers) return;
         for (Provider provider : providers) {
