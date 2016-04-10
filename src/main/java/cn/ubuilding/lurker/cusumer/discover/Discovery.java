@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.cusumer.discover;
 
 
-import cn.ubuilding.lurker.common.RemoteAddress;
+import java.net.InetSocketAddress;
 
 /**
  * @author Wu Jianfeng
@@ -15,7 +15,7 @@ public abstract class Discovery {
     /**
      * 发现远程服务信息
      */
-    public abstract RemoteAddress discover();
+    public abstract InetSocketAddress discover();
 
     /**
      * Discovery 自身的描述信息

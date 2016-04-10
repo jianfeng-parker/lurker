@@ -1,6 +1,6 @@
 package cn.ubuilding.lurker.cusumer.discover;
 
-import cn.ubuilding.lurker.common.RemoteAddress;
+import java.net.InetSocketAddress;
 
 /**
  * @author Wu Jianfeng
@@ -14,7 +14,7 @@ public class RedisDiscovery extends Discovery {
         this.key = key;
     }
 
-    public RemoteAddress discover() {
+    public InetSocketAddress discover() {
         return null;
     }
 

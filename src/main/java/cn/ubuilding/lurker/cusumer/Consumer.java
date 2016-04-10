@@ -1,6 +1,5 @@
 package cn.ubuilding.lurker.cusumer;
 
-import cn.ubuilding.lurker.common.RemoteAddress;
 import cn.ubuilding.lurker.common.Request;
 import cn.ubuilding.lurker.common.Response;
 import cn.ubuilding.lurker.cusumer.discover.DefaultDiscovery;
@@ -9,22 +8,17 @@ import net.sf.cglib.proxy.InvocationHandler;
 import net.sf.cglib.proxy.Proxy;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.InetSocketAddress;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author Wu Jianfeng
  * @since 16/4/2 18:00
+ * 目标服务的Proxy实现
  * // TODO 使用spring -> ProxyBeanFactory 生成目标接口实例
  */
 
 public final class Consumer {
-
-    private static AtomicLong callTimes = new AtomicLong(0L);
-
-    private List<Connection> connections;
 
     private Connection connection;
 
@@ -40,12 +34,12 @@ public final class Consumer {
         if (null == discovery) {
             throw new IllegalArgumentException("discovery must not be null");
         }
-        RemoteAddress address = discovery.discover();
+        InetSocketAddress address = discovery.discover();
         if (null == address) {
             throw new RuntimeException("not discovered any remote service used " + discovery.description() + " by key(" + discovery.getKey() + ")");
         }
         this.serviceKey = discovery.getKey();
-        initConnection(address.getHost(), address.getPort());
+        this.connection = ConnectionFactory.getConnection(address);
     }
 
     /**
@@ -55,7 +49,6 @@ public final class Consumer {
      */
     public Consumer(String key) {
         this(new DefaultDiscovery(key));
-        this.serviceKey = key;
     }
 
     /**
@@ -69,7 +62,7 @@ public final class Consumer {
 
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
-                new LurkerInvoker(getConnection(), serviceKey));
+                new LurkerInvoker(this.connection, this.serviceKey));
     }
 
     public String getRemoteHost() {
@@ -82,31 +75,6 @@ public final class Consumer {
 
     public String getServiceKey() {
         return serviceKey;
-    }
-
-    /**
-     * 获取连接对象
-     */
-    private Connection getConnection() {
-        int d = (int) (callTimes.getAndIncrement() % (connections.size() + 1));
-        if (d == 0) {
-            return connection;
-        } else {
-            return connections.get(d - 1);
-        }
-    }
-
-    private void initConnection(String remoteHost, int remotePort) {
-        this.connection = new Connection(remoteHost, remotePort);
-        this.connection.connect();
-        this.connections = new ArrayList<Connection>();
-        int num = Runtime.getRuntime().availableProcessors() / 3 - 2;
-        for (int i = 0; i < num; i++) {
-            this.connections.add(new Connection(remoteHost, remotePort));
-        }
-        for (Connection conn : connections) {
-            conn.connect();
-        }
     }
 
     private class LurkerInvoker implements InvocationHandler {

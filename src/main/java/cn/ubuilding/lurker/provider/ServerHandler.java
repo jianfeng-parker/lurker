@@ -21,9 +21,9 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private static Map<String, Map<String, Object>> ThreadLocalMap = new HashMap<String, Map<String, Object>>();
 
-    private final Map<String, Provider> handlerMap;
+    private final Map<String, ProviderInfo> handlerMap;
 
-    public ServerHandler(Map<String, Provider> handlerMap) {
+    public ServerHandler(Map<String, ProviderInfo> handlerMap) {
         this.handlerMap = handlerMap;
     }
 
@@ -50,11 +50,11 @@ public class ServerHandler extends ChannelInboundHandlerAdapter {
     private Response handle(Request request) {
         try {
 
-            Provider provider = handlerMap.get(request.getServiceKey());
-            if (null == provider) {
+            ProviderInfo providerInfo = handlerMap.get(request.getServiceKey());
+            if (null == providerInfo) {
                 return new Response(request.getId(), null, new ClassNotFoundException("not found any services by key:" + request.getServiceKey()));
             }
-            Object serviceBean = provider.getImplementation();
+            Object serviceBean = providerInfo.getImplementation();
             Class<?> serviceClass = serviceBean.getClass();
             String methodName = request.getMethodName();
             Class<?>[] parameterTypes = request.getParameterTypes();

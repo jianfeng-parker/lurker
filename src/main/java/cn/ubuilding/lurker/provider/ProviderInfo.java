@@ -3,9 +3,10 @@ package cn.ubuilding.lurker.provider;
 /**
  * @author Wu Jianfeng
  * @since 16/4/3 16:05
+ * 服务实现者对象模型
  */
 @SuppressWarnings("unused")
-public class Provider {
+public class ProviderInfo {
 
     /**
      * 唯一标识某一个RPC服务提供者

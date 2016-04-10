@@ -12,8 +12,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Wu Jianfeng
@@ -30,29 +28,26 @@ public class Connection {
 
     private volatile Channel channel;
 
-    private Map<String, Channel> channels = new ConcurrentHashMap<String, Channel>();
-
     private boolean connected = false;
 
-    public Connection(String host, int port) {
-        if (null == host || host.trim().length() == 0 || port <= 0) {
-            throw new IllegalArgumentException("invalid host(" + host + ") or port(" + port + ")");
-        }
-        this.address = new InetSocketAddress(host, port);
+    public Connection(InetSocketAddress address) {
+        this.address = address;
         this.handler = new ConsumerHandler();
         init();
     }
 
-
+    /**
+     * 创建当前Connection实例与服务端的连接
+     * 并保存连接中与服务端的Channel对象
+     * // TODO 此处有一个问题: 因为连接是异步的，所以有可能出现在连接还没有成功的情况下调用者就调用@see #send()方法了
+     */
     public void connect() {
         try {
             ChannelFuture future = bootstrap.connect(address);//.sync();
             future.addListener(new ChannelFutureListener() {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
-                        Channel c = future.channel();
-                        channels.put(c.remoteAddress().toString(), c);
-                        channel = c;
+                        channel = future.channel();
                         connected = true;
                     }
                 }
@@ -63,9 +58,6 @@ public class Connection {
     }
 
     public Response send(Request request) {
-        if (null == channel) {
-            channel = getChannel(address.toString());
-        }
         if (null != channel) {
             ResponseFuture future = new ResponseFuture(request);
             this.handler.addFuture(future);
@@ -110,10 +102,6 @@ public class Connection {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }
-
-    private Channel getChannel(String key) {
-        return channels.get(key);
     }
 
 
