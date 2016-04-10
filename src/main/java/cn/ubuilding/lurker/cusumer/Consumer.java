@@ -27,39 +27,42 @@ public final class Consumer {
      */
     private String serviceKey;
 
+    private Class<?> interfaceClass;
+
+    /**
+     * 默认使用 {@link DefaultDiscovery} 发现远程服务
+     *
+     * @param key            远程服务唯一标识
+     * @param interfaceClass 目标服务接口的class
+     */
+    public Consumer(String key, Class<?> interfaceClass) {
+        this(new DefaultDiscovery(key), interfaceClass);
+    }
+
     /**
      * @param discovery 用于发现远程服务信息
      */
-    public Consumer(Discovery discovery) {
+    public Consumer(Discovery discovery, Class<?> interfaceClass) {
         if (null == discovery) {
             throw new IllegalArgumentException("discovery must not be null");
+        }
+        if (null == interfaceClass) {
+            throw new IllegalArgumentException("interface class must not be null");
         }
         InetSocketAddress address = discovery.discover();
         if (null == address) {
             throw new RuntimeException("not discovered any remote service used " + discovery.description() + " by key(" + discovery.getKey() + ")");
         }
         this.serviceKey = discovery.getKey();
+        this.interfaceClass = interfaceClass;
         this.connection = ConnectionFactory.getConnection(address);
     }
 
     /**
-     * 默认使用 {@link DefaultDiscovery} 发现远程服务
-     *
-     * @param key 远程服务唯一标识
-     */
-    public Consumer(String key) {
-        this(new DefaultDiscovery(key));
-    }
-
-    /**
      * 返回一个目标服务接口的代理实例
-     *
-     * @param interfaceClass 远程服务接口 class
      */
     @SuppressWarnings("unchecked")
-    public <T> T instance(Class<T> interfaceClass) {
-        if (null == interfaceClass) throw new IllegalArgumentException("interface class must not be null");
-
+    public <T> T instance() {
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
                 new LurkerInvoker(this.connection, this.serviceKey));
