@@ -10,7 +10,7 @@ import java.util.Properties;
  * 该类用于解析配置参数或提供默认参数
  */
 
-public final class DefaultConfig {
+public class DefaultConfig {
 
     private Properties properties;
 

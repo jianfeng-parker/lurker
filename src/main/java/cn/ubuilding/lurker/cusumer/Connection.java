@@ -18,7 +18,7 @@ import java.net.InetSocketAddress;
  * @since 16/4/4 16:45
  */
 
-public class Connection {
+public final class Connection {
 
     private Bootstrap bootstrap;
 

@@ -12,7 +12,7 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
  * @since 16/4/10 16:05
  */
 
-public class ResponseFuture implements Future<Response> {
+public final class ResponseFuture implements Future<Response> {
 
     private Request request;
 
