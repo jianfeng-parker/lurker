@@ -1,6 +1,6 @@
 package cn.ubuilding.lurker.cusumer;
 
-import cn.ubuilding.lurker.common.Response;
+import cn.ubuilding.lurker.protocol.Response;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 

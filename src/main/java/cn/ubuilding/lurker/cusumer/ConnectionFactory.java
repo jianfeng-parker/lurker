@@ -1,7 +1,6 @@
 package cn.ubuilding.lurker.cusumer;
 
 
-import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,20 +21,26 @@ final class ConnectionFactory {
      */
     private static Map<String, List<Connection>> connections = new ConcurrentHashMap<String, List<Connection>>();
 
-    static Connection getConnection(InetSocketAddress address) {
-        if (address == null) throw new NullPointerException("remote address");
-        List<Connection> list = connections.get(address.toString());
+    static Connection getConnection(String address) {
+        if (address == null || address.length() == 0) {
+            throw new NullPointerException("remote address");
+        }
+        if (address.split(":").length != 2) {
+            throw new IllegalArgumentException("invalid address, it must be formatted by 'host:port'");
+        }
+        List<Connection> list = connections.get(address);
         // 若远程服务地址对应的连接对象不存在
         if (null == list || list.size() == 0) {
+            String[] addr = address.split(":");
             int num = Runtime.getRuntime().availableProcessors() / 3 - 2;
             list = new ArrayList<Connection>(num);
             for (int i = 0; i < num; i++) { // 创建连接对象
-                list.add(new Connection(address));
+                list.add(new Connection(addr[0], Integer.parseInt(addr[1])));
             }
             for (Connection conn : list) {
                 conn.connect();
             }
-            connections.put(address.toString(), list);
+            connections.put(address, list);
         }
         // 获取连接对象并返回
         int d = (int) (callTimes.getAndIncrement() % (list.size() + 1));

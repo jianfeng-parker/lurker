@@ -1,9 +1,9 @@
 package cn.ubuilding.lurker.cusumer;
 
-import cn.ubuilding.lurker.common.Decoder;
-import cn.ubuilding.lurker.common.Encoder;
-import cn.ubuilding.lurker.common.Request;
-import cn.ubuilding.lurker.common.Response;
+import cn.ubuilding.lurker.codec.Decoder;
+import cn.ubuilding.lurker.codec.Encoder;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.*;
@@ -22,7 +22,9 @@ public final class Connection {
 
     private Bootstrap bootstrap;
 
-    private InetSocketAddress address;
+    private String host;
+
+    private int port;
 
     private ConsumerHandler handler;
 
@@ -30,8 +32,9 @@ public final class Connection {
 
     private boolean connected = false;
 
-    public Connection(InetSocketAddress address) {
-        this.address = address;
+    public Connection(String host, int port) {
+        this.host = host;
+        this.port = port;
         this.handler = new ConsumerHandler();
         init();
     }
@@ -43,7 +46,7 @@ public final class Connection {
      */
     public void connect() {
         try {
-            ChannelFuture future = bootstrap.connect(address);//.sync();
+            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));//.sync();
             future.addListener(new ChannelFutureListener() {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
@@ -70,11 +73,11 @@ public final class Connection {
     }
 
     public String getHost() {
-        return address.getHostName();
+        return host;
     }
 
     public int getPort() {
-        return address.getPort();
+        return port;
     }
 
     public boolean isConnected() {

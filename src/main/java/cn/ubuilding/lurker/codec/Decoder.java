@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.common;
+package cn.ubuilding.lurker.codec;
 
 import cn.ubuilding.lurker.serializer.DefaultSerializer;
 import cn.ubuilding.lurker.serializer.Serializer;

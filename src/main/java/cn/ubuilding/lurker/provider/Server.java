@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.provider;
 
-import cn.ubuilding.lurker.provider.registry.DefaultRegister;
-import cn.ubuilding.lurker.provider.registry.Register;
+import cn.ubuilding.lurker.registry.publish.DefaultPublisher;
+import cn.ubuilding.lurker.registry.publish.Publisher;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public final class Server {
     /**
      * 用于将服务信息发布到注册中心
      */
-    private Register register;
+    private Publisher publisher;
 
     /**
      * RPC服务端口
@@ -40,17 +40,17 @@ public final class Server {
     /**
      * RPC服务提供者列表
      */
-    private List<ProviderInfo> providerInfos;
+    private List<Provider> providers;
 
-    public Server(String host, List<ProviderInfo> providerInfos) {
-        this(host, 8899, false, providerInfos);
+    public Server(String host, List<Provider> providers) {
+        this(host, 8899, false, providers);
     }
 
-    public Server(String host, int port, boolean useSSL, List<ProviderInfo> providerInfos) {
+    public Server(String host, int port, boolean useSSL, List<Provider> providers) {
         this.port = port;
         this.host = host;
         this.useSSL = useSSL;
-        this.providerInfos = providerInfos;
+        this.providers = providers;
     }
 
     /**
@@ -60,15 +60,15 @@ public final class Server {
         validate();// 验证参数
         try {
             if (serverBoot == null) {
-                serverBoot = new ServerBoot(providerInfos, getPort());
+                serverBoot = new ServerBoot(providers, getPort());
             }
             serverBoot.start();// 启动服务
-            if (null == register) {
-                register = new DefaultRegister();
+            if (null == publisher) {
+                publisher = new DefaultPublisher();
             }
-            register.registry(host, port, providerInfos); // 发布服务
+            publisher.publish(host, port, providers); // 发布服务
         } catch (Exception e) {
-            System.out.println("registry  failure:" + e.getMessage());
+            System.out.println("publish  failure:" + e.getMessage());
         }
 
     }
@@ -93,29 +93,29 @@ public final class Server {
         this.port = port;
     }
 
-    public List<ProviderInfo> getProviderInfos() {
-        return providerInfos;
+    public List<Provider> getProviders() {
+        return providers;
     }
 
-    public void setProviderInfos(List<ProviderInfo> providerInfos) {
-        this.providerInfos = providerInfos;
+    public void setProviders(List<Provider> providers) {
+        this.providers = providers;
     }
 
     public void setHost(String host) {
         this.host = host;
     }
 
-    public Register getRegister() {
-        return register;
+    public Publisher getPublisher() {
+        return publisher;
     }
 
-    public void setRegister(Register register) {
-        this.register = register;
+    public void setPublisher(Publisher publisher) {
+        this.publisher = publisher;
     }
 
     private void validate() {
-        if (null == providerInfos || providerInfos.size() == 0) {
-            throw new IllegalArgumentException("not found any providers to registry");
+        if (null == providers || providers.size() == 0) {
+            throw new IllegalArgumentException("not found any providers to publish");
         }
         if (this.port <= 0) {
             throw new IllegalArgumentException("invalid port:" + this.port);

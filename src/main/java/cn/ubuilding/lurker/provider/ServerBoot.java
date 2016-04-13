@@ -1,6 +1,8 @@
 package cn.ubuilding.lurker.provider;
 
-import cn.ubuilding.lurker.common.*;
+import cn.ubuilding.lurker.codec.*;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,27 +21,27 @@ import java.util.Map;
 
 public final class ServerBoot {
 
-    private Map<String, ProviderInfo> providerMap = new HashMap<String, ProviderInfo>();
+    private Map<String, Provider> providerMap = new HashMap<String, Provider>();
 
     private int port;
 
     private boolean useSSL;
 
-    public ServerBoot(List<ProviderInfo> providerInfos, int port, boolean useSSL) {
-        if (null == providerInfos || providerInfos.size() == 0)
+    public ServerBoot(List<Provider> providers, int port, boolean useSSL) {
+        if (null == providers || providers.size() == 0)
             throw new IllegalArgumentException("not found any service to provide");
         this.port = port;
         this.useSSL = useSSL;
-        for (ProviderInfo providerInfo : providerInfos) {
-            providerMap.put(providerInfo.getKey(), providerInfo);
+        for (Provider provider : providers) {
+            providerMap.put(provider.getKey(), provider);
         }
         if (useSSL) {
             // TODO nothing
         }
     }
 
-    public ServerBoot(List<ProviderInfo> providerInfos, int port) {
-        this(providerInfos, port, false);
+    public ServerBoot(List<Provider> providers, int port) {
+        this(providers, port, false);
     }
 
     public void start() throws Exception {

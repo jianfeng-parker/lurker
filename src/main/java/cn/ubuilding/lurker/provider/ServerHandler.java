@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.provider;
 
-import cn.ubuilding.lurker.common.Request;
-import cn.ubuilding.lurker.common.Response;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.sf.cglib.reflect.FastClass;
@@ -21,9 +21,9 @@ public final class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private static Map<String, Map<String, Object>> ThreadLocalMap = new HashMap<String, Map<String, Object>>();
 
-    private final Map<String, ProviderInfo> handlerMap;
+    private final Map<String, Provider> handlerMap;
 
-    public ServerHandler(Map<String, ProviderInfo> handlerMap) {
+    public ServerHandler(Map<String, Provider> handlerMap) {
         this.handlerMap = handlerMap;
     }
 
@@ -50,11 +50,11 @@ public final class ServerHandler extends ChannelInboundHandlerAdapter {
     private Response handle(Request request) {
         try {
 
-            ProviderInfo providerInfo = handlerMap.get(request.getServiceKey());
-            if (null == providerInfo) {
-                return new Response(request.getId(), null, new ClassNotFoundException("not found any services by key:" + request.getServiceKey()));
+            Provider provider = handlerMap.get(request.getServiceKey());
+            if (null == provider) {
+                return new Response(request.getId(), null, new ClassNotFoundException("not found any services by serviceKey:" + request.getServiceKey()));
             }
-            Object serviceBean = providerInfo.getImplementation();
+            Object serviceBean = provider.getImplementation();
             Class<?> serviceClass = serviceBean.getClass();
             String methodName = request.getMethodName();
             Class<?>[] parameterTypes = request.getParameterTypes();

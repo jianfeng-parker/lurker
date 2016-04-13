@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.common;
+package cn.ubuilding.lurker.protocol;
 
 /**
  * @author Wu Jianfeng

@@ -1,6 +1,4 @@
-package cn.ubuilding.lurker.cusumer.discover;
-
-import java.net.InetSocketAddress;
+package cn.ubuilding.lurker.registry.discover;
 
 /**
  * @author Wu Jianfeng
@@ -10,12 +8,16 @@ import java.net.InetSocketAddress;
 
 public class RedisDiscovery extends Discovery {
 
-    public RedisDiscovery(String key) {
-        this.key = key;
+    public RedisDiscovery(String serviceKey) {
+        this.serviceKey = serviceKey;
     }
 
-    public InetSocketAddress discover() {
+    public String discover() {
         return null;
+    }
+
+    public void stop() {
+
     }
 
     public String description() {

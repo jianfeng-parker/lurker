@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.cusumer;
 
-import cn.ubuilding.lurker.common.Request;
-import cn.ubuilding.lurker.common.Response;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;

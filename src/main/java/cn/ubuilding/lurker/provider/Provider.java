@@ -6,7 +6,7 @@ package cn.ubuilding.lurker.provider;
  * 服务实现者对象模型
  */
 @SuppressWarnings("unused")
-public class ProviderInfo {
+public class Provider {
 
     /**
      * 唯一标识某一个RPC服务提供者

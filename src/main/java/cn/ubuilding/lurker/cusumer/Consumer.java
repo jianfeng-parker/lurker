@@ -1,14 +1,13 @@
 package cn.ubuilding.lurker.cusumer;
 
-import cn.ubuilding.lurker.common.Request;
-import cn.ubuilding.lurker.common.Response;
-import cn.ubuilding.lurker.cusumer.discover.DefaultDiscovery;
-import cn.ubuilding.lurker.cusumer.discover.Discovery;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
+import cn.ubuilding.lurker.registry.discover.DefaultDiscovery;
+import cn.ubuilding.lurker.registry.discover.Discovery;
 import net.sf.cglib.proxy.InvocationHandler;
 import net.sf.cglib.proxy.Proxy;
 
 import java.lang.reflect.Method;
-import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
@@ -32,11 +31,12 @@ public final class Consumer {
     /**
      * 默认使用 {@link DefaultDiscovery} 发现远程服务
      *
-     * @param key            远程服务唯一标识
-     * @param interfaceClass 目标服务接口的class
+     * @param serviceKey      远程服务唯一标识
+     * @param registryAddress 服务注册中心地址
+     * @param interfaceClass  目标服务接口的class
      */
-    public Consumer(String key, Class<?> interfaceClass) {
-        this(new DefaultDiscovery(key), interfaceClass);
+    public Consumer(String serviceKey, String registryAddress, Class<?> interfaceClass) {
+        this(new DefaultDiscovery(serviceKey, registryAddress), interfaceClass);
     }
 
     /**
@@ -49,11 +49,11 @@ public final class Consumer {
         if (null == interfaceClass) {
             throw new IllegalArgumentException("interface class must not be null");
         }
-        InetSocketAddress address = discovery.discover();
+        String address = discovery.discover();
         if (null == address) {
-            throw new RuntimeException("not discovered any remote service used " + discovery.description() + " by key(" + discovery.getKey() + ")");
+            throw new RuntimeException("not discovered any remote service used " + discovery.description() + " by serviceKey(" + discovery.getServiceKey() + ")");
         }
-        this.serviceKey = discovery.getKey();
+        this.serviceKey = discovery.getServiceKey();
         this.interfaceClass = interfaceClass;
         this.connection = ConnectionFactory.getConnection(address);
     }
@@ -91,7 +91,7 @@ public final class Consumer {
             this.serviceKey = serviceKey;
         }
 
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        public Response invoke(Object proxy, Method method, Object[] args) throws Throwable {
             Request request = new Request();
             request.setId(UUID.randomUUID().toString());
             request.setServiceKey(serviceKey);
@@ -100,11 +100,14 @@ public final class Consumer {
             request.setParameters(args);
 
             Response response = connection.send(request);
-
-            if (null != response.getError()) {
-                throw response.getError();
+            if (null != response) {
+                if (null != response.getError()) {
+                    throw response.getError();
+                }
+                return response;
+            } else {
+                return null;
             }
-            return response;
         }
     }
 }
