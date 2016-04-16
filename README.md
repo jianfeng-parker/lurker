@@ -146,7 +146,7 @@
           </constructor-arg>
           <!--注册中心地址(默认使用zookeeper)-->
           <constructor-arg index="3" value="127.0.0.1:2181"/>
-      </bean>
+  </bean>
 
 ```
 

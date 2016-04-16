@@ -18,6 +18,15 @@ public class Provider {
      */
     private Object implementation;
 
+    public Provider() {
+
+    }
+
+    public Provider(String serviceKey, Object implementation) {
+        this.serviceKey = serviceKey;
+        this.implementation = implementation;
+    }
+
     public String getServiceKey() {
         return serviceKey;
     }
