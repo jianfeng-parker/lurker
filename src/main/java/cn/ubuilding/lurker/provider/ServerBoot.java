@@ -25,23 +25,13 @@ public final class ServerBoot {
 
     private int port;
 
-    private boolean useSSL;
-
-    public ServerBoot(List<Provider> providers, int port, boolean useSSL) {
+    public ServerBoot(List<Provider> providers, int port) {
         if (null == providers || providers.size() == 0)
             throw new IllegalArgumentException("not found any service to provide");
         this.port = port;
-        this.useSSL = useSSL;
         for (Provider provider : providers) {
-            providerMap.put(provider.getKey(), provider);
+            providerMap.put(provider.getServiceKey(), provider);
         }
-        if (useSSL) {
-            // TODO nothing
-        }
-    }
-
-    public ServerBoot(List<Provider> providers, int port) {
-        this(providers, port, false);
     }
 
     public void start() throws Exception {
@@ -69,16 +59,4 @@ public final class ServerBoot {
         }
     }
 
-//    private void initSslCtx() {
-//        try {
-//            if (ssl) {
-//                SelfSignedCertificate ssc = new SelfSignedCertificate();
-//                sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
-//            } else {
-//                sslCtx = null;
-//            }
-//        } catch (Exception e) {
-//            // TODO logging...
-//        }
-//    }
 }

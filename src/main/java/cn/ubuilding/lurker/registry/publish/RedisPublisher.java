@@ -11,8 +11,10 @@ import java.util.List;
  * 注：这里的场景是将Redis作为作为服务注册中心
  */
 
-public class RedisPublisher implements Publisher {
-    public void publish(String host, int port, List<Provider> providers) {
+public class RedisPublisher extends Publisher {
+
+    @Override
+    public void publish() {
 
     }
 }

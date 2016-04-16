@@ -21,7 +21,33 @@ final class ConnectionFactory {
      */
     private static Map<String, List<Connection>> connections = new ConcurrentHashMap<String, List<Connection>>();
 
-    static Connection getConnection(String address) {
+    static Connection get(String address) {
+        List<Connection> list = connections.get(address);
+        if (null == list || list.size() == 0) {
+            create(address);
+        }
+        list = connections.get(address);
+        // 获取连接对象并返回
+        int d = (int) (callTimes.getAndIncrement() % (list.size() + 1));
+        if (d == 0) {
+            return list.get(0);
+        } else {
+            return list.get(d - 1);
+        }
+
+    }
+
+    static void reset(String address) {
+        connections.remove(address);
+        create(address);
+    }
+
+    /**
+     * 重新初始化连接
+     *
+     * @param address 远程服务地址
+     */
+    private static void create(String address) {
         if (address == null || address.length() == 0) {
             throw new NullPointerException("remote address");
         }
@@ -42,14 +68,7 @@ final class ConnectionFactory {
             }
             connections.put(address, list);
         }
-        // 获取连接对象并返回
-        int d = (int) (callTimes.getAndIncrement() % (list.size() + 1));
-        if (d == 0) {
-            return list.get(0);
-        } else {
-            return list.get(d - 1);
-        }
-
     }
+
 
 }

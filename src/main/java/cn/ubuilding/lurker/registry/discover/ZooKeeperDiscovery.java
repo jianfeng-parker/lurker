@@ -1,6 +1,9 @@
 package cn.ubuilding.lurker.registry.discover;
 
+import cn.ubuilding.lurker.registry.HostAndPort;
+import cn.ubuilding.lurker.registry.event.LurkerListener;
 import cn.ubuilding.lurker.registry.Constant;
+import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
@@ -14,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
  * 注: 默认从zookeeper上获取信息
  */
 
-public class DefaultDiscovery extends Discovery {
+public class ZooKeeperDiscovery extends Discovery {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -31,9 +34,14 @@ public class DefaultDiscovery extends Discovery {
     /**
      * 从注册中心获取的远程服务地址
      */
-    private String remoteAddress;
+    private HostAndPort remoteAddress;
 
-    public DefaultDiscovery(String serviceKey, String registryAddress) {
+    /**
+     * 相当于一个Listener
+     */
+    private LurkerListener<HostAndPort> changer;
+
+    public ZooKeeperDiscovery(String serviceKey, String registryAddress) {
         if (null == serviceKey || serviceKey.length() == 0) {
             throw new NullPointerException("serviceKey");
         }
@@ -48,7 +56,7 @@ public class DefaultDiscovery extends Discovery {
         }
     }
 
-    public String discover() {
+    public HostAndPort discover() {
         if (null == remoteAddress) getData(zooKeeper);
         return remoteAddress;
     }
@@ -88,25 +96,33 @@ public class DefaultDiscovery extends Discovery {
      */
     private void getData(final ZooKeeper zk) {
         try {
-            // TODO 节点路径
-            byte[] data = zk.getData("", new Watcher() {
+            byte[] data = zk.getData(Constant.fullPathForZk(serviceKey), new Watcher() {
                 public void process(WatchedEvent event) {
                     if (event.getType() == Event.EventType.NodeDataChanged) {
                         getData(zk);
-                        // TODO 节点(远程服务地址)变化后更新客户端信息
                     }
                 }
             }, null);
 
-            if (null != data) remoteAddress = new String(data, "UTF-8");
+            if (null != data) {
+                remoteAddress = new HostAndPort(new String(data, "UTF-8"));// 更新本地属性值
+                if (null != changer) changer.onChange(remoteAddress);
+            }
+        } catch (KeeperException.NoNodeException e) {
+            System.out.println(">>>>" + e.getMessage());
         } catch (Exception e) {
             // TODO logging...
+            System.out.println(">>>>get data failure:" + e.getMessage());
 
         }
     }
 
     public String description() {
         return "Default Discovery(zookeeper)";
+    }
+
+    public void setChanger(LurkerListener<HostAndPort> changer) {
+        this.changer = changer;
     }
 
 }

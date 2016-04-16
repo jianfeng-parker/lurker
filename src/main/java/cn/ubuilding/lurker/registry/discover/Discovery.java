@@ -1,6 +1,9 @@
 package cn.ubuilding.lurker.registry.discover;
 
 
+import cn.ubuilding.lurker.registry.HostAndPort;
+import cn.ubuilding.lurker.registry.event.LurkerListener;
+
 /**
  * @author Wu Jianfeng
  * @since 16/4/4 21:32
@@ -14,7 +17,7 @@ public abstract class Discovery {
     /**
      * 发现远程服务信息
      */
-    public abstract String discover();
+    public abstract HostAndPort discover();
 
     public abstract void stop();
 
@@ -22,6 +25,13 @@ public abstract class Discovery {
      * Discovery 自身的描述信息
      */
     public abstract String description();
+
+    /**
+     * 监听serviceKey在注册中心发生的变化
+     *
+     * @param changer 监听器
+     */
+    public abstract void setChanger(LurkerListener<HostAndPort> changer);
 
     /**
      * 返回 Discovery要发现的远程服务的唯一标识

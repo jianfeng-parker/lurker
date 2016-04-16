@@ -39,7 +39,7 @@
 ```xml
   <!--添加依赖-->
   <dependency>
-      <groupId>cn.ubuilding.platform</groupId>
+      <groupId>cn.ubuilding.lurker</groupId>
       <artifactId>lurker-rpc</artifactId>
       <version>1.0-SNAPSHOT</version>
   </dependency>
@@ -50,18 +50,20 @@
 ```java
    
   /**
-   * key: 由服务发布方提供，即可以唯一标识服务的值，Consumer端使用该key从注册中心获取服务相关信息
+   * serviceKey: 由服务发布方提供，即可以唯一标识服务的值，Consumer端使用该key从注册中心获取服务相关信息
    */  
    public class XXService{
+   
+     // 初始化Consumer实例时传递一个key，即使用默认的Discover(from zookeeper)获取远程服务信息
+     // 效果等同于new Consumer(new DefaultDiscovery(serviceKey), HelloService.class).instance();
+     // 也可以使用从Redis获取服务信息Discovery:new Consumer(new RedisDiscovery(serviceKey), HelloService.class).instance()
+     // 也可以使用自定义的Discovery，实现Discovery接口即可
+     // 具体到哪里获取服务信息，取决于服务端将服务信息发布到哪里
      public String sayHello(String name){
-         // 初始化Consumer实例时传递一个key，即使用默认的Discover(from zookeeper)获取远程服务信息
-         // 效果等同于new Consumer(new DefaultDiscovery(key), HelloService.class).instance();
-         // 也可以使用从Redis获取服务信息Discovery:new Consumer(new RedisDiscovery(key), HelloService.class).instance()
-         // 也可以使用自定义的Discovery，实现Discovery接口即可
-         // 具体到哪里获取服务信息，取决于服务端将服务信息发布到哪里
-         HelloService helloService = new Consumer(key, HelloService.class).instance();
+         HelloService helloService = new Consumer(serviceKey, HelloService.class).instance();
          return helloService.say("Parker");
      }
+     
    }
   
 ```
@@ -71,7 +73,7 @@
   
   <!--添加依赖-->
   <dependency>
-      <groupId>cn.ubuilding.platform</groupId>
+      <groupId>cn.ubuilding.lurker</groupId>
       <artifactId>lurker-rpc</artifactId>
       <version>1.0-SNAPSHOT</version>
   </dependency>
@@ -91,12 +93,6 @@
    
 ```
 
-```xml
-  
-  <bean id="helloService" class="xx.xx.xx.HelloServiceImpl"/>
-  
-``` 
-
 ###### 接口发布方式1：
 
 ```java
@@ -106,8 +102,8 @@
        private HelloServiceImpl helloService;
        
        public void publish(){
-           List<ProviderInfo> providers = new ArrayList<ProviderInfo>();
-           providers.add(new ProviderInfo(key,"1.0.0",helloService));
+           List<Provider> providers = new ArrayList<Provider>();
+           providers.add(new Provider(serviceKey,helloService));
            // providers.add(发布的其它服务);
            new Server("127.0.0.1",providers).start();
        }
@@ -119,13 +115,14 @@
 
 ```xml
 
+  <bean id="helloService" class="xx.xx.xx.HelloServiceImpl"/>
+
   <bean id="rpcPublisher" class="cn.ubuilding.lurker.provider.Server" init-method="start">
      <constructor-arg index="0" value="127.0.0.1"/>
      <constructor-arg index="1">
        <list>
-          <bean class="cn.ubuilding.lurker.provider.ProviderInfo">
-             <property name="key" value="xxx"/>
-             <property name="version" value="1.0.0"/>
+          <bean class="cn.ubuilding.lurker.provider.Provider">
+             <property name="serviceKey" value="xxx"/>
              <property name="implementation" ref="helloService"/>
           </bean>
        </list>

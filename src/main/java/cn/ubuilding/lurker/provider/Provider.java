@@ -11,32 +11,19 @@ public class Provider {
     /**
      * 唯一标识某一个RPC服务提供者
      */
-    private String key;
-
-    /**
-     * 服务版本
-     */
-    private String version;
+    private String serviceKey;
 
     /**
      * RPC服务实现者
      */
     private Object implementation;
 
-    public String getKey() {
-        return key;
+    public String getServiceKey() {
+        return serviceKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
+    public void setServiceKey(String serviceKey) {
+        this.serviceKey = serviceKey;
     }
 
     public Object getImplementation() {

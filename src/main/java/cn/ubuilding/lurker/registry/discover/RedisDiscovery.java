@@ -1,5 +1,8 @@
 package cn.ubuilding.lurker.registry.discover;
 
+import cn.ubuilding.lurker.registry.HostAndPort;
+import cn.ubuilding.lurker.registry.event.LurkerListener;
+
 /**
  * @author Wu Jianfeng
  * @since 16/4/4 21:38
@@ -12,7 +15,7 @@ public class RedisDiscovery extends Discovery {
         this.serviceKey = serviceKey;
     }
 
-    public String discover() {
+    public HostAndPort discover() {
         return null;
     }
 
@@ -22,5 +25,9 @@ public class RedisDiscovery extends Discovery {
 
     public String description() {
         return "Redis Discovery";
+    }
+
+    public void setChanger(LurkerListener<HostAndPort> changer) {
+
     }
 }
