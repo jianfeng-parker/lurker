@@ -44,16 +44,16 @@ public class ZooKeeperPublisher extends Publisher {
         this.rpcAddress = new HostAndPort(host, port);
         this.providers = providers;
         this.registryAddress = registryAddress;
-        this.zookeeper = connect();
-        if (null != zookeeper) {
-            boolean existRootPath = exist(Constant.ZK_REGISTRY_ROOT_PATH);
-            if (!existRootPath) {// 如果根节点不存在创建一个根节点
-                create(Constant.ZK_REGISTRY_ROOT_PATH, new byte[0]);
-            }
-        }
     }
 
     public void publish() {
+        if (null == zookeeper || !zookeeper.getState().isAlive()) {
+            zookeeper = connect();
+        }
+        boolean existRootPath = exist(Constant.ZK_REGISTRY_ROOT_PATH);
+        if (!existRootPath) {// 如果根节点不存在创建一个根节点
+            create(Constant.ZK_REGISTRY_ROOT_PATH, new byte[0]);
+        }
         for (Provider provider : getProviders()) {
             // serviceKey对应zookeeper 中的path
             String servicePath = Constant.fullPathForZk(provider.getServiceKey());

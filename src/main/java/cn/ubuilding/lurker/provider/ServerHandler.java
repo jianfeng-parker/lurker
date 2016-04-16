@@ -28,12 +28,11 @@ public final class ServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        Request request = (Request) msg;
-        // discard the received data silently
-//        ((ByteBuf) msg).release();
-//        context.writeAndFlush(msg);
-        Response response = handle(request);
-        ctx.writeAndFlush(response);
+        if (msg instanceof Request) {
+            Request request = (Request) msg;
+            Response response = handle(request);
+            ctx.writeAndFlush(response);
+        }
     }
 
     public void channelReadComplete(ChannelHandlerContext ctx) {

@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.cusumer;
+package cn.ubuilding.lurker.consumer;
 
 import cn.ubuilding.lurker.protocol.Response;
 import io.netty.buffer.Unpooled;

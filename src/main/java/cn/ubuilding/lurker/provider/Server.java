@@ -1,9 +1,23 @@
 package cn.ubuilding.lurker.provider;
 
+import cn.ubuilding.lurker.codec.Decoder;
+import cn.ubuilding.lurker.codec.Encoder;
+import cn.ubuilding.lurker.protocol.Request;
+import cn.ubuilding.lurker.protocol.Response;
 import cn.ubuilding.lurker.registry.publish.ZooKeeperPublisher;
 import cn.ubuilding.lurker.registry.publish.Publisher;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Wu Jianfeng
@@ -11,11 +25,6 @@ import java.util.List;
  */
 
 public final class Server {
-
-    /**
-     * 用于启动RPC服务
-     */
-    private ServerBoot serverBoot;
 
     /**
      * 用于将服务信息发布到注册中心
@@ -37,13 +46,14 @@ public final class Server {
      */
     private List<Provider> providers;
 
+    private Map<String, Provider> providerMap = new HashMap<String, Provider>();
+
     public Server(String host, List<Provider> providers, String registryAddress) {
         this(host, 8899, providers, registryAddress);
     }
 
     public Server(String host, int port, List<Provider> providers, String registryAddress) {
         this(host, port, providers, new ZooKeeperPublisher(host, port, providers, registryAddress));
-
     }
 
     public Server(String host, int port, List<Provider> providers, Publisher publisher) {
@@ -51,7 +61,6 @@ public final class Server {
         this.port = port;
         this.providers = providers;
         this.publisher = publisher;
-        this.serverBoot = new ServerBoot(providers, port);
     }
 
     /**
@@ -59,8 +68,32 @@ public final class Server {
      */
     public void start() {
         try {
-            serverBoot.start();// 启动服务
-            publisher.publish(); // 发布服务
+            EventLoopGroup bossGroup = new NioEventLoopGroup();
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
+            try {
+                ServerBootstrap bootstrap = new ServerBootstrap();
+                bootstrap.group(bossGroup, workerGroup)
+                        .channel(NioServerSocketChannel.class)
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            public void initChannel(SocketChannel ch) throws Exception {
+                                ch.pipeline().addLast(new Decoder(Request.class))
+                                        .addLast(new Encoder(Response.class))
+                                        .addLast(new ServerHandler(providerMap));
+                            }
+                        })
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true);
+                ChannelFuture f = bootstrap.bind(port).sync();
+
+                publisher.publish(); // 发布服务
+
+                f.channel().closeFuture().sync();
+            } finally {
+                workerGroup.shutdownGracefully();
+                bossGroup.shutdownGracefully();
+            }
+
         } catch (Exception e) {
             System.out.println("publish  failure:" + e.getMessage());
         }

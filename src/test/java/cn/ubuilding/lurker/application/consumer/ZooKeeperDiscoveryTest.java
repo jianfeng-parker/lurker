@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.consumer;
+package cn.ubuilding.lurker.application.consumer;
 
 import cn.ubuilding.lurker.registry.HostAndPort;
 import cn.ubuilding.lurker.registry.discover.ZooKeeperDiscovery;

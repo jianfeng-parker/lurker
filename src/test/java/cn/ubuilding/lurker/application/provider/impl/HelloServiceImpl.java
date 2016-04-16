@@ -1,6 +1,7 @@
-package cn.ubuilding.lurker.provider.biz;
+package cn.ubuilding.lurker.application.provider.impl;
 
-import cn.ubuilding.lurker.biz.HelloService;
+
+import cn.ubuilding.lurker.iface.HelloService;
 
 /**
  * @author Wu Jianfeng

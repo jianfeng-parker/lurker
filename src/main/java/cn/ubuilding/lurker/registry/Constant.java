@@ -7,7 +7,7 @@ package cn.ubuilding.lurker.registry;
 
 public final class Constant {
 
-    public static final int ZK_CONNECTION_TIMEOUT = 5000;
+    public static final int ZK_CONNECTION_TIMEOUT = 10000;
 
     public static final String ZK_REGISTRY_ROOT_PATH = "/lurker";
 

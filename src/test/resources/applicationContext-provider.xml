@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+    <bean id="helloService" class="cn.ubuilding.lurker.application.provider.impl.HelloServiceImpl"/>
+
+    <bean id="doSomethingService" class="cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl"/>
+
+    <bean id="rpcServer" class="cn.ubuilding.lurker.provider.Server" init-method="start">
+        <!--rpc服务暴露地址-->
+        <constructor-arg index="0" value=" 127.0.0.1"/>
+        <!--rpc服务暴露端口-->
+        <constructor-arg index="1" value="8899"/>
+        <!--暴露的rpc服务列表-->
+        <constructor-arg index="2">
+            <list>
+                <bean class="cn.ubuilding.lurker.provider.Provider">
+                    <!--唯一标识服务的key,客户端根据该key从注册中心获取前面配置的rpc服务地址-->
+                    <property name="serviceKey" value="helloService_1.0"/>
+                    <!--rpc服饰实现者-->
+                    <property name="implementation" ref="helloService"/>
+                </bean>
+                <bean class="cn.ubuilding.lurker.provider.Provider">
+                    <property name="serviceKey" value="doSomethingService_1.0"/>
+                    <property name="implementation" ref="doSomethingService"/>
+                </bean>
+            </list>
+        </constructor-arg>
+        <!--注册中心地址(默认使用zookeeper)-->
+        <constructor-arg index="3" value="127.0.0.1:2181"/>
+    </bean>
+
+</beans>

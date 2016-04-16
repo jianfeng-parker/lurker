@@ -1,7 +1,7 @@
-package cn.ubuilding.lurker.consumer;
+package cn.ubuilding.lurker.application.consumer;
 
-import cn.ubuilding.lurker.biz.HelloService;
-import cn.ubuilding.lurker.cusumer.Consumer;
+import cn.ubuilding.lurker.consumer.Consumer;
+import cn.ubuilding.lurker.iface.HelloService;
 
 /**
  * @author Wu Jianfeng

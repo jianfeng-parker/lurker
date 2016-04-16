@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.biz;
+package cn.ubuilding.lurker.iface;
 
 /**
  * @author Wu Jianfeng
