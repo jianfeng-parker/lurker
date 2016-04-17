@@ -4,7 +4,7 @@ import cn.ubuilding.lurker.codec.Decoder;
 import cn.ubuilding.lurker.codec.Encoder;
 import cn.ubuilding.lurker.protocol.Request;
 import cn.ubuilding.lurker.protocol.Response;
-import cn.ubuilding.lurker.provider.registry.ZooKeeperRegister;
+import cn.ubuilding.lurker.provider.registry.DefaultRegister;
 import cn.ubuilding.lurker.provider.registry.Register;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -53,7 +53,7 @@ public final class Server {
     }
 
     public Server(String host, int port, List<Provider> providers, String registryAddress) {
-        this(host, port, providers, new ZooKeeperRegister(host, port, providers, registryAddress));
+        this(host, port, providers, new DefaultRegister(host, port, providers, registryAddress));
     }
 
     public Server(String host, int port, List<Provider> providers, Register register) {

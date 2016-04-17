@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
  * 注：这里的场景是将zookeeper作为默认的服务注册中心
  */
 
-public class ZooKeeperRegister extends Register {
+public class DefaultRegister extends Register {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -28,7 +28,7 @@ public class ZooKeeperRegister extends Register {
 
     private ZooKeeper zookeeper;
 
-    public ZooKeeperRegister(String host, int port, List<Provider> providers, String registryAddress) {
+    public DefaultRegister(String host, int port, List<Provider> providers, String registryAddress) {
         if (null == host || host.length() == 0) {
             throw new IllegalArgumentException("host must not be null");
         }

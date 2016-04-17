@@ -2,7 +2,7 @@ package cn.ubuilding.lurker.consumer;
 
 import cn.ubuilding.lurker.protocol.Request;
 import cn.ubuilding.lurker.protocol.Response;
-import cn.ubuilding.lurker.consumer.discover.ZooKeeperDiscovery;
+import cn.ubuilding.lurker.consumer.discover.DefaultDiscovery;
 import cn.ubuilding.lurker.consumer.discover.Discovery;
 import cn.ubuilding.lurker.util.HostAndPort;
 import cn.ubuilding.lurker.event.LurkerListener;
@@ -31,14 +31,14 @@ public final class Consumer {
     private Class<?> interfaceClass;
 
     /**
-     * 默认使用 {@link ZooKeeperDiscovery} 发现远程服务
+     * 默认使用 {@link DefaultDiscovery} 发现远程服务
      *
      * @param serviceKey      远程服务唯一标识
      * @param registryAddress 服务注册中心地址
      * @param interfaceClass  目标服务接口的class
      */
     public Consumer(String serviceKey, String registryAddress, Class<?> interfaceClass) {
-        this(new ZooKeeperDiscovery(serviceKey, registryAddress), interfaceClass);
+        this(new DefaultDiscovery(serviceKey, registryAddress), interfaceClass);
     }
 
     /**

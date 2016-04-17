@@ -17,7 +17,7 @@ import java.util.concurrent.CountDownLatch;
  * 注: 默认从zookeeper上获取信息
  */
 
-public class ZooKeeperDiscovery extends Discovery {
+public class DefaultDiscovery extends Discovery {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -41,7 +41,7 @@ public class ZooKeeperDiscovery extends Discovery {
      */
     private LurkerListener<HostAndPort> changer;
 
-    public ZooKeeperDiscovery(String serviceKey, String registryAddress) {
+    public DefaultDiscovery(String serviceKey, String registryAddress) {
         if (null == serviceKey || serviceKey.length() == 0) {
             throw new NullPointerException("serviceKey");
         }
