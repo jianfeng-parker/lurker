@@ -1,7 +1,7 @@
-package cn.ubuilding.lurker.registry.publish;
+package cn.ubuilding.lurker.provider.registry;
 
 import cn.ubuilding.lurker.provider.Provider;
-import cn.ubuilding.lurker.registry.HostAndPort;
+import cn.ubuilding.lurker.util.HostAndPort;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * 服务 <strong>发布</strong>接口
  */
 
-public abstract class Publisher {
+public abstract class Register {
 
     /**
      * 服务实现者地址

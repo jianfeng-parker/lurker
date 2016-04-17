@@ -1,8 +1,8 @@
-package cn.ubuilding.lurker.registry.publish;
+package cn.ubuilding.lurker.provider.registry;
 
 import cn.ubuilding.lurker.provider.Provider;
-import cn.ubuilding.lurker.registry.Constant;
-import cn.ubuilding.lurker.registry.HostAndPort;
+import cn.ubuilding.lurker.util.Constant;
+import cn.ubuilding.lurker.util.HostAndPort;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 
@@ -16,7 +16,7 @@ import java.util.concurrent.CountDownLatch;
  * 注：这里的场景是将zookeeper作为默认的服务注册中心
  */
 
-public class ZooKeeperPublisher extends Publisher {
+public class ZooKeeperRegister extends Register {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -28,7 +28,7 @@ public class ZooKeeperPublisher extends Publisher {
 
     private ZooKeeper zookeeper;
 
-    public ZooKeeperPublisher(String host, int port, List<Provider> providers, String registryAddress) {
+    public ZooKeeperRegister(String host, int port, List<Provider> providers, String registryAddress) {
         if (null == host || host.length() == 0) {
             throw new IllegalArgumentException("host must not be null");
         }

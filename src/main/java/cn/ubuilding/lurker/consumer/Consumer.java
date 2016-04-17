@@ -2,10 +2,10 @@ package cn.ubuilding.lurker.consumer;
 
 import cn.ubuilding.lurker.protocol.Request;
 import cn.ubuilding.lurker.protocol.Response;
-import cn.ubuilding.lurker.registry.discover.ZooKeeperDiscovery;
-import cn.ubuilding.lurker.registry.discover.Discovery;
-import cn.ubuilding.lurker.registry.HostAndPort;
-import cn.ubuilding.lurker.registry.event.LurkerListener;
+import cn.ubuilding.lurker.consumer.discover.ZooKeeperDiscovery;
+import cn.ubuilding.lurker.consumer.discover.Discovery;
+import cn.ubuilding.lurker.util.HostAndPort;
+import cn.ubuilding.lurker.event.LurkerListener;
 import net.sf.cglib.proxy.InvocationHandler;
 import net.sf.cglib.proxy.Proxy;
 

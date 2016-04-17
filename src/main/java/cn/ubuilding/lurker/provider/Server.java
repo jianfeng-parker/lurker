@@ -4,8 +4,8 @@ import cn.ubuilding.lurker.codec.Decoder;
 import cn.ubuilding.lurker.codec.Encoder;
 import cn.ubuilding.lurker.protocol.Request;
 import cn.ubuilding.lurker.protocol.Response;
-import cn.ubuilding.lurker.registry.publish.ZooKeeperPublisher;
-import cn.ubuilding.lurker.registry.publish.Publisher;
+import cn.ubuilding.lurker.provider.registry.ZooKeeperRegister;
+import cn.ubuilding.lurker.provider.registry.Register;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -29,7 +29,7 @@ public final class Server {
     /**
      * 用于将服务信息发布到注册中心
      */
-    private Publisher publisher;
+    private Register register;
 
     /**
      * RPC服务端口
@@ -53,14 +53,14 @@ public final class Server {
     }
 
     public Server(String host, int port, List<Provider> providers, String registryAddress) {
-        this(host, port, providers, new ZooKeeperPublisher(host, port, providers, registryAddress));
+        this(host, port, providers, new ZooKeeperRegister(host, port, providers, registryAddress));
     }
 
-    public Server(String host, int port, List<Provider> providers, Publisher publisher) {
+    public Server(String host, int port, List<Provider> providers, Register register) {
         this.host = host;
         this.port = port;
         this.providers = providers;
-        this.publisher = publisher;
+        this.register = register;
     }
 
     /**
@@ -86,7 +86,7 @@ public final class Server {
                         .childOption(ChannelOption.SO_KEEPALIVE, true);
                 ChannelFuture f = bootstrap.bind(port).sync();
 
-                publisher.publish(); // 发布服务
+                register.publish(); // 发布服务
 
                 f.channel().closeFuture().sync();
             } finally {
@@ -123,12 +123,12 @@ public final class Server {
         this.host = host;
     }
 
-    public Publisher getPublisher() {
-        return publisher;
+    public Register getRegister() {
+        return register;
     }
 
-    public void setPublisher(Publisher publisher) {
-        this.publisher = publisher;
+    public void setRegister(Register register) {
+        this.register = register;
     }
 
 }

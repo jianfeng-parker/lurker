@@ -1,8 +1,4 @@
-package cn.ubuilding.lurker.registry.publish;
-
-import cn.ubuilding.lurker.provider.Provider;
-
-import java.util.List;
+package cn.ubuilding.lurker.provider.registry;
 
 /**
  * @author Wu Jianfeng
@@ -11,7 +7,7 @@ import java.util.List;
  * 注：这里的场景是将Redis作为作为服务注册中心
  */
 
-public class RedisPublisher extends Publisher {
+public class RedisRegister extends Register {
 
     @Override
     public void publish() {

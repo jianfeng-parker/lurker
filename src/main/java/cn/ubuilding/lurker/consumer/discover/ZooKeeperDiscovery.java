@@ -1,8 +1,8 @@
-package cn.ubuilding.lurker.registry.discover;
+package cn.ubuilding.lurker.consumer.discover;
 
-import cn.ubuilding.lurker.registry.HostAndPort;
-import cn.ubuilding.lurker.registry.event.LurkerListener;
-import cn.ubuilding.lurker.registry.Constant;
+import cn.ubuilding.lurker.util.HostAndPort;
+import cn.ubuilding.lurker.event.LurkerListener;
+import cn.ubuilding.lurker.util.Constant;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;

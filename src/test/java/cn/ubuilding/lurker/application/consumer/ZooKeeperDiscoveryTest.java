@@ -1,8 +1,8 @@
 package cn.ubuilding.lurker.application.consumer;
 
-import cn.ubuilding.lurker.registry.HostAndPort;
-import cn.ubuilding.lurker.registry.discover.ZooKeeperDiscovery;
-import cn.ubuilding.lurker.registry.discover.Discovery;
+import cn.ubuilding.lurker.util.HostAndPort;
+import cn.ubuilding.lurker.consumer.discover.ZooKeeperDiscovery;
+import cn.ubuilding.lurker.consumer.discover.Discovery;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

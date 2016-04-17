@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.registry.event;
+package cn.ubuilding.lurker.event;
 
 /**
  * @author Wu Jianfeng

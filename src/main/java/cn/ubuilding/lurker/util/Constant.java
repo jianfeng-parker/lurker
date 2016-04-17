@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.registry;
+package cn.ubuilding.lurker.util;
 
 /**
  * @author Wu Jianfeng
