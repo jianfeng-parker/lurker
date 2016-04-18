@@ -1,9 +1,11 @@
 ### 基于Netty4.0.35.Final实现的RPC框架
 
 ------
-网络通讯框架: Netty
-服务注册中心: ZooKeeper
-序列化工具: protostuff
+> * 网络通讯框架: Netty
+
+> * 服务注册中心: ZooKeeper
+
+> * 序列化工具: protostuff
 
 ### Consumer(Client):
 
@@ -13,7 +15,7 @@
 
 > * 动态监听远程服务地址的变化
 
-> * 向远程服务发情请求并接受返回结果
+> * 向远程服务发送请求并接受返回结果
 
 ### Provider(Server):
 
