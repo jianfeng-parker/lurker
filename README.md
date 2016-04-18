@@ -1,11 +1,11 @@
-### 基于Netty4.0.35.Final实现的RPC框架
+### 基于Netty实现的RPC框架
 
 ------
-> * 网络通讯框架: Netty
+> * 网络通讯框架: Netty, Version: 4.0.35.Final
 
-> * 服务注册中心: ZooKeeper
+> * 服务注册中心: ZooKeeper, Version: 3.4.6
 
-> * 序列化工具: protostuff
+> * 序列化工具: protostuff, Version: 1.3.8
 
 ### Consumer(Client):
 
