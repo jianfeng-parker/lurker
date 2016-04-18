@@ -2,6 +2,8 @@ package cn.ubuilding.lurker;
 
 //import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl;
+import cn.ubuilding.lurker.application.provider.impl.HelloServiceImpl;
 import cn.ubuilding.lurker.provider.Provider;
 import cn.ubuilding.lurker.provider.Server;
 
@@ -23,14 +25,14 @@ public class LurkerServer {
         List<Provider> providers = new ArrayList<Provider>();
 
         Provider provider1 = new Provider();
-        provider1.setServiceKey("xxService");
-//        provider1.setImplementation(); // TODO set 服务接口实现类
+        provider1.setServiceKey("helloService_1.0");
+        provider1.setImplementation(new HelloServiceImpl());
 
         providers.add(provider1);
 
         Provider provider2 = new Provider();
-        provider2.setServiceKey("xxService");
-//        provider2.setImplementation(); // TODO set 服务接口实现类
+        provider2.setServiceKey("doSomethingService_1.0");
+        provider2.setImplementation(new DoSomethingServiceImpl());
 
         providers.add(provider2);
 

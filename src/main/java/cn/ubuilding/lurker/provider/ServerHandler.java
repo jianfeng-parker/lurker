@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 
 public final class ServerHandler extends ChannelInboundHandlerAdapter {
+
+    private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
     private static Map<String, Map<String, Object>> ThreadLocalMap = new HashMap<String, Map<String, Object>>();
 
@@ -41,11 +45,10 @@ public final class ServerHandler extends ChannelInboundHandlerAdapter {
 
     public void exceptionCaught(ChannelHandlerContext context, Throwable cause) {
         // close the connection when an exception is raised
-        // TODO logging...
+        logger.error("server handle error:\n" + cause);
         context.close();
     }
 
-    // TODO 缓存
     private Response handle(Request request) {
         try {
 

@@ -2,6 +2,8 @@ package cn.ubuilding.lurker.consumer;
 
 import cn.ubuilding.lurker.protocol.Request;
 import cn.ubuilding.lurker.protocol.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +15,8 @@ import java.util.concurrent.locks.AbstractQueuedSynchronizer;
  */
 
 public final class ResponseFuture implements Future<Response> {
+
+    private static final Logger logger = LoggerFactory.getLogger(ResponseFuture.class);
 
     private Request request;
 
@@ -39,7 +43,7 @@ public final class ResponseFuture implements Future<Response> {
             if (success) return this.response;
             else throw new RuntimeException("time out to get response for request id(" + this.request.getId() + ")");
         } catch (InterruptedException e) {
-            // TODO logging...
+            logger.error("get response for request(" + request.getId() + ") from future failure:" + e.getMessage());
             return null;
         }
     }
@@ -55,7 +59,7 @@ public final class ResponseFuture implements Future<Response> {
         this.mutex.release(1);
         // TODO  此处还可以执行其它逻辑
         if (doneTime - this.startTime > 3000) {
-            // TODO logging: request is so slowly
+            logger.info("the request(" + request.getId() + ") is so slowly");
         }
 
     }

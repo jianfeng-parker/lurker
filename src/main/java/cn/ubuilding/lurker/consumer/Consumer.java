@@ -74,6 +74,18 @@ public final class Consumer {
                 new RemoteServiceInvoker(this.serviceKey));
     }
 
+    public String remoteHost() {
+        return connection.getHost();
+    }
+
+    public int remotePort() {
+        return connection.getPort();
+    }
+
+    public boolean isConnected() {
+        return connection.isConnected();
+    }
+
     public Connection getConnection() {
         return connection;
     }
@@ -121,6 +133,7 @@ public final class Consumer {
          */
         public void onChange(HostAndPort address) {
             if (null != address) {
+                Consumer.this.getConnection().close();
                 Consumer.this.setConnection(new Connection(address.getHost(), address.getPort()));
             }
         }

@@ -10,6 +10,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 
@@ -20,7 +22,7 @@ import java.net.InetSocketAddress;
 
 public final class Connection {
 
-    private Bootstrap bootstrap;
+    private static final Logger logger = LoggerFactory.getLogger(Connection.class);
 
     private String host;
 
@@ -39,27 +41,6 @@ public final class Connection {
         init();
     }
 
-    /**
-     * 创建当前Connection实例与服务端的连接
-     * 并保存连接中与服务端的Channel对象
-     * // TODO 此处有一个问题: 因为连接是异步的，所以有可能出现在连接还没有成功的情况下调用者就调用@see #send()方法了
-     */
-    public void connect() {
-        try {
-            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));//.sync();
-            future.addListener(new ChannelFutureListener() {
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (future.isSuccess()) {
-                        channel = future.channel();
-                        connected = true;
-                    }
-                }
-            });
-        } catch (Exception e) {
-            // TODO logging...
-        }
-    }
-
     public Response send(Request request) {
         if (null != channel) {
             ResponseFuture future = new ResponseFuture(request);
@@ -70,6 +51,12 @@ public final class Connection {
             return null;
         }
 
+    }
+
+    public void close() {
+        if (null != channel) {
+            channel.close();
+        }
     }
 
     public String getHost() {
@@ -87,7 +74,7 @@ public final class Connection {
     private void init() {
         try {
             EventLoopGroup group = new NioEventLoopGroup();
-            bootstrap = new Bootstrap();
+            Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group).channel(NioSocketChannel.class)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
@@ -102,8 +89,20 @@ public final class Connection {
                     .option(ChannelOption.TCP_NODELAY, true)//
                     .option(ChannelOption.SO_REUSEADDR, true);
 //                    .option(ChannelOption.AUTO_CLOSE, false);
+
+            // TODO 此处有一个问题: 因为连接是异步的，所以有可能出现在连接还没有成功的情况下调用者就调用@see #send()方法了
+
+            ChannelFuture future = bootstrap.connect(new InetSocketAddress(host, port));//.sync();
+            future.addListener(new ChannelFutureListener() {
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        channel = future.channel();
+                        connected = true;
+                    }
+                }
+            });
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error("initialize connection to remote server() failure:" + ex.getMessage());
         }
     }
 

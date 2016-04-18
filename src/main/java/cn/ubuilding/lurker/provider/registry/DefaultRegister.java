@@ -5,6 +5,8 @@ import cn.ubuilding.lurker.util.Constant;
 import cn.ubuilding.lurker.util.HostAndPort;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -17,6 +19,8 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class DefaultRegister extends Register {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultRegister.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -71,7 +75,7 @@ public class DefaultRegister extends Register {
         try {
             zookeeper.close();
         } catch (Exception e) {
-            // TODO logging...
+            logger.error("close connection to zookeeper(" + registryAddress + ") error:" + e.getMessage());
         }
     }
 
@@ -87,7 +91,7 @@ public class DefaultRegister extends Register {
             });
             latch.await();
         } catch (Exception e) {
-            // TODO logging...
+            logger.error("connect to zookeeper(" + registryAddress + ") failure:" + e.getMessage());
         }
         return zk;
     }
@@ -96,7 +100,7 @@ public class DefaultRegister extends Register {
         try {
             zookeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
         } catch (Exception e) {
-            // TODO logging
+            logger.error("create node(" + path + ") in zookeeper(" + registryAddress + ") failure:" + e.getMessage());
         }
     }
 
@@ -104,7 +108,7 @@ public class DefaultRegister extends Register {
         try {
             zookeeper.setData(path, data, -1);
         } catch (Exception e) {
-            // TODO logging
+            logger.error("update node(" + path + ") in zookeeper(" + registryAddress + ") failure:" + e.getMessage());
 
         }
     }
@@ -114,7 +118,7 @@ public class DefaultRegister extends Register {
             Stat stat = zookeeper.exists(path, false);
             return null != stat;
         } catch (Exception e) {
-            // TODO logging
+            logger.error("find node(" + path + ") to judge exist or not in zookeeper(" + registryAddress + ") failure:" + e.getMessage());
             return false;
         }
     }

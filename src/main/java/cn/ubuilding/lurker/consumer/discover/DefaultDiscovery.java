@@ -7,6 +7,8 @@ import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -18,6 +20,8 @@ import java.util.concurrent.CountDownLatch;
  */
 
 public class DefaultDiscovery extends Discovery {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultDiscovery.class);
 
     private CountDownLatch latch = new CountDownLatch(1);
 
@@ -34,7 +38,7 @@ public class DefaultDiscovery extends Discovery {
     /**
      * 从注册中心获取的远程服务地址
      */
-    private HostAndPort remoteAddress;
+    private HostAndPort rpcAddress;
 
     /**
      * 相当于一个Listener
@@ -57,8 +61,8 @@ public class DefaultDiscovery extends Discovery {
     }
 
     public HostAndPort discover() {
-        if (null == remoteAddress) getData(zooKeeper);
-        return remoteAddress;
+        if (null == rpcAddress) getData(zooKeeper);
+        return rpcAddress;
     }
 
     public void stop() {
@@ -85,7 +89,7 @@ public class DefaultDiscovery extends Discovery {
             });
             latch.await();
         } catch (Exception e) {
-            // TODO logging...
+            logger.error("connect to zookeeper(" + registryAddress + ") failure:" + e.getMessage());
         }
         return zk;
     }
@@ -95,8 +99,9 @@ public class DefaultDiscovery extends Discovery {
      * 并设置对该节点的监听
      */
     private void getData(final ZooKeeper zk) {
+        String path = Constant.fullPathForZk(serviceKey);
         try {
-            byte[] data = zk.getData(Constant.fullPathForZk(serviceKey), new Watcher() {
+            byte[] data = zk.getData(path, new Watcher() {
                 public void process(WatchedEvent event) {
                     if (event.getType() == Event.EventType.NodeDataChanged) {
                         getData(zk);
@@ -105,15 +110,13 @@ public class DefaultDiscovery extends Discovery {
             }, null);
 
             if (null != data) {
-                remoteAddress = new HostAndPort(new String(data, "UTF-8"));// 更新本地属性值
-                if (null != changer) changer.onChange(remoteAddress);
+                rpcAddress = new HostAndPort(new String(data, "UTF-8"));// 更新本地属性值
+                if (null != changer) changer.onChange(rpcAddress);
             }
         } catch (KeeperException.NoNodeException e) {
-            System.out.println(">>>>" + e.getMessage());
+            logger.error("not found node(" + path + ") to get data from zookeeper(" + registryAddress + ")");
         } catch (Exception e) {
-            // TODO logging...
-            System.out.println(">>>>get data failure:" + e.getMessage());
-
+            logger.error(" get data from zookeeper(" + registryAddress + ") failure:" + e.getMessage());
         }
     }
 
