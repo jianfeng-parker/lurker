@@ -1,0 +1,2 @@
+cn.ubuilding.lurker.v2.rpc.proxy.cglib.CglibProxyFactory
+cn.ubuilding.lurker.v2.rpc.proxy.jdk.JdkProxyFactory

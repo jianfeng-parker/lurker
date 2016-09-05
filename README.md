@@ -158,4 +158,10 @@
 
 ```
 
+### 基于Netty实现的RPC框架(V2)
+
+> * v2版本的实现代码在package:v2中
+> * 用户通过扩展的spring标签配置RPC服务信息;
+> * 启动服务(Netty)未实现；客户端(consumer/refer)未实现；
+
 
