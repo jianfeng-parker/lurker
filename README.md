@@ -58,17 +58,17 @@
 ```java
    
   /**
-   * serviceKey: 由服务发布方提供，即可以唯一标识服务的值，Consumer端使用该key从注册中心获取服务相关信息
+   * serviceName: 由服务发布方提供，即可以唯一标识服务的值，Consumer端使用该key从注册中心获取服务相关信息
    */  
    public class XXService{
    
      // 初始化Consumer实例时传递一个key，即使用默认的Discover(from zookeeper)获取远程服务信息
-     // 效果等同于new Consumer(new DefaultDiscovery(serviceKey), HelloService.class).instance();
-     // 也可以使用从Redis获取服务信息Discovery:new Consumer(new RedisDiscovery(serviceKey), HelloService.class).instance()
+     // 效果等同于new Consumer(new DefaultDiscovery(serviceName), HelloService.class).instance();
+     // 也可以使用从Redis获取服务信息Discovery:new Consumer(new RedisDiscovery(serviceName), HelloService.class).instance()
      // 也可以使用自定义的Discovery，实现Discovery接口即可
      // 具体到哪里获取服务信息，取决于服务端将服务信息发布到哪里
      public String sayHello(String name){
-         HelloService helloService = new Consumer(serviceKey, HelloService.class).instance();
+         HelloService helloService = new Consumer(serviceName, HelloService.class).instance();
          return helloService.say("Parker");
      }
      
@@ -115,7 +115,7 @@
         */
        public void publish(){
            List<Provider> providers = new ArrayList<Provider>();
-           providers.add(new Provider(serviceKey,helloService));
+           providers.add(new Provider(serviceName,helloService));
            // providers.add(发布的其它服务);
            new Server("127.0.0.1",providers).start();
        }
@@ -142,12 +142,12 @@
               <list>
                   <bean class="cn.ubuilding.lurker.provider.Provider">
                       <!--唯一标识服务的key,客户端根据该key从注册中心获取前面配置的rpc服务地址-->
-                      <property name="serviceKey" value="helloService_1.0"/>
+                      <property name="serviceName" value="helloService_1.0"/>
                       <!--rpc服饰实现者-->
                       <property name="implementation" ref="helloService"/>
                   </bean>
                   <bean class="cn.ubuilding.lurker.provider.Provider">
-                      <property name="serviceKey" value="doSomethingService_1.0"/>
+                      <property name="serviceName" value="doSomethingService_1.0"/>
                       <property name="implementation" ref="doSomethingService"/>
                   </bean>
               </list>

@@ -1,6 +1,6 @@
 package cn.ubuilding.lurker.application.consumer;
 
-import cn.ubuilding.lurker.consumer.Consumer;
+import cn.ubuilding.lurker.client.Client;
 import cn.ubuilding.lurker.iface.HelloService;
 
 /**
@@ -13,7 +13,7 @@ public class BizService {
     private HelloService helloService;
 
     private void init() {
-        helloService = new Consumer("helloService", "127.0.0.1:2181", HelloService.class).instance();
+        helloService = new Client("127.0.0.1:2181", HelloService.class).create();
     }
 
 }
