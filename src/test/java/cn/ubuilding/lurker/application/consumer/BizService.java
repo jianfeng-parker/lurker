@@ -13,7 +13,7 @@ public class BizService {
     private HelloService helloService;
 
     private void init() {
-        helloService = new Client("127.0.0.1:2181", HelloService.class).create();
+        helloService = new Client("127.0.0.1:2181").create(HelloService.class);
     }
 
 }

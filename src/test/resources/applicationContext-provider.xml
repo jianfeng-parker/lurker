@@ -8,8 +8,12 @@
 
     <bean id="doSomethingService" class="cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl"/>
 
-    <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server" >
+    <bean id="zkRegistry" class="cn.ubuilding.lurker.support.registry.ZookeeperRegistry">
+        <constructor-arg value="localhost:2181"/>
+    </bean>
 
+    <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server">
+        <constructor-arg type="cn.ubuilding.lurker.support.registry.Registry" ref="zkRegistry"/>
     </bean>
 
 </beans>

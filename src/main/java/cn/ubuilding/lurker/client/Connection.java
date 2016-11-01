@@ -28,18 +28,16 @@ public final class Connection {
 
     private int port;
 
-    private ConsumerHandler handler;
+    private ClientHandler handler;
 
     private EventLoopGroup eventLoopGroup;
 
     private volatile Channel channel;
 
-    private boolean connected = false;
-
     public Connection(String host, int port) {
         this.host = host;
         this.port = port;
-        this.handler = new ConsumerHandler();
+        this.handler = new ClientHandler();
         init();
     }
 
@@ -71,10 +69,6 @@ public final class Connection {
         return port;
     }
 
-    public boolean isConnected() {
-        return connected;
-    }
-
     private void init() {
         try {
             eventLoopGroup = new NioEventLoopGroup();
@@ -101,7 +95,6 @@ public final class Connection {
                 public void operationComplete(ChannelFuture future) throws Exception {
                     if (future.isSuccess()) {
                         channel = future.channel();
-                        connected = true;
                     }
                 }
             });

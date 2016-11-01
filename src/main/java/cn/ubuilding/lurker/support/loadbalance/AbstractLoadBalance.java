@@ -19,9 +19,8 @@ public abstract class AbstractLoadBalance implements LoadBalance {
         }
     }
 
-    // todo
-    protected int getWeight() {
-        return 100;
+    protected int getWeight(String address) {
+        return 0; // TODO
     }
 
     protected abstract String doSelect(List<String> addresses);

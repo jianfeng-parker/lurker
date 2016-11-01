@@ -1,13 +1,13 @@
 package cn.ubuilding.lurker.client;
 
-import cn.ubuilding.lurker.support.NetUtils;
-import cn.ubuilding.lurker.support.loadbalance.LoadBalance;
+import cn.ubuilding.lurker.support.registry.RegistryChanger;
 import cn.ubuilding.lurker.support.loadbalance.LoadBalanceFactory;
 import cn.ubuilding.lurker.support.registry.Registry;
 import cn.ubuilding.lurker.support.registry.ZookeeperRegistry;
 import net.sf.cglib.proxy.Proxy;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Wu Jianfeng
@@ -21,7 +21,9 @@ public final class Client {
     /**
      * remote服务地址
      */
-    private volatile List<String> addresses;
+    private static ConcurrentHashMap<String, List<String>> addresses = new ConcurrentHashMap<String, List<String>>();
+
+    private Registry registry;
 
     private String loadBalance;
 
@@ -48,16 +50,8 @@ public final class Client {
         if (null == registry) {
             throw new IllegalArgumentException("registry must not be null");
         }
-
-        registry.addListener(interfaceClass.getName(), this);
-
-        List<String> addresses = registry.discover(interfaceClass.getName());
-        if (null == addresses || addresses.size() == 0) {
-            throw new IllegalStateException("not found any remote addresses for service(" + interfaceClass.getName() + ")");
-        }
-        this.addresses = addresses;
+        this.registry = registry;
         this.loadBalance = loadBalance;
-        setConnection();
     }
 
     /**
@@ -68,32 +62,44 @@ public final class Client {
         if (null == interfaceClass) {
             throw new IllegalArgumentException("interface class must not be null");
         }
+        List<String> addrList = addresses.get(interfaceClass.getName());
+        if (null == addrList || addrList.size() == 0) {
+            List<String> list = registry.discover(interfaceClass.getName());
+            if (null == list || list.size() == 0) {
+                throw new IllegalStateException("not found any remote service addresses");
+            } else {
+                addresses.putIfAbsent(interfaceClass.getName(), list);
+                addrList = addresses.get(interfaceClass.getName());
+            }
+        }
+
+        // invocation内部持有远程连接，并实现远程通信
+        // 将invocation赋予Changer实例是便于 Changer监听到Registry发生变化后可以更新invocation内部连接等信息
+        RemoteServiceInvocation invocation = new RemoteServiceInvocation(interfaceClass.getName(), addrList, loadBalance);
+        registry.addListener(interfaceClass.getName(), new RemoteAddressChanger(invocation));
         return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
-                new Class<?>[]{interfaceClass},
-                new RemoteServiceProxy(interfaceClass.getName()));
+                new Class<?>[]{interfaceClass}, invocation);
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
+    private class RemoteAddressChanger implements RegistryChanger<String, List<String>> {
 
-    /**
-     * 设置远程连接对象
-     * 从本地缓存的
-     */
-    private void setConnection() {
-        if (null == this.addresses || this.addresses.size() == 0) {
-            throw new IllegalStateException("not found valid remote address");
+        private RemoteServiceInvocation invocation;
+
+        public RemoteAddressChanger(RemoteServiceInvocation invocation) {
+            this.invocation = invocation;
         }
-        LoadBalance lb = (this.loadBalance == null || this.loadBalance.length() == 0) ?
-                LoadBalanceFactory.getDefault() : LoadBalanceFactory.get(this.loadBalance);
-        String address = (null == lb) ? this.addresses.get(0) : lb.select(this.addresses);
-        String[] adds = address.split(NetUtils.ADDRESS_SEPARATOR);
-        if (adds.length != 2) {
-            throw new IllegalArgumentException("invalid remote address: " + address);
-        }
-        this.connection = new Connection(adds[0], Integer.parseInt(adds[1]));
-    }
 
+        /**
+         * 远程服务地址变更后，重新设置该Consumer对象中的connection
+         *
+         * @param addressList 变更后的远程服务地址
+         */
+        public void onChange(String serviceName, List<String> addressList) {
+            if (null != addressList && addressList.size() > 0) {
+                addresses.putIfAbsent(serviceName, addressList);
+                invocation.updateConnection(addressList);
+            }
+        }
+    }
 
 }

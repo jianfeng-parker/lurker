@@ -109,6 +109,10 @@ public final class Server implements ApplicationContextAware, InitializingBean {
     }
 
     public void afterPropertiesSet() throws Exception {
+       start();
+    }
+
+    private void start() {
         try {
             EventLoopGroup bossGroup = new NioEventLoopGroup();
             EventLoopGroup workerGroup = new NioEventLoopGroup();

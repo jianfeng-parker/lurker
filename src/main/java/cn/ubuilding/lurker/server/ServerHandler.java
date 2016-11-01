@@ -3,7 +3,7 @@ package cn.ubuilding.lurker.server;
 import cn.ubuilding.lurker.support.rpc.protocol.Request;
 import cn.ubuilding.lurker.support.rpc.protocol.Response;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.sf.cglib.reflect.FastClass;
 import net.sf.cglib.reflect.FastMethod;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ import java.util.Map;
  * 处理客户端Channel的 Handler
  */
 
-public final class ServerHandler extends SimpleChannelInboundHandler<Request> {
+public final class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerHandler.class);
 
@@ -34,11 +34,6 @@ public final class ServerHandler extends SimpleChannelInboundHandler<Request> {
             Response response = handle(request);
             ctx.writeAndFlush(response);
         }
-    }
-
-    @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Request msg) throws Exception {
-
     }
 
     public void channelReadComplete(ChannelHandlerContext ctx) {

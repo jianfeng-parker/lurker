@@ -2,9 +2,7 @@ package cn.ubuilding.lurker.support.loadbalance;
 
 import cn.ubuilding.lurker.support.annotation.LB;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * @author Wu Jianfeng
@@ -28,7 +26,6 @@ public final class LoadBalanceFactory {
             String value = annotation.value();
             loadBalances.putIfAbsent(value, bean);
         }
-
     }
 
     public static LoadBalance get(String name) {
@@ -41,4 +38,14 @@ public final class LoadBalanceFactory {
     public static LoadBalance getDefault() {
         return get(RANDOM);
     }
+
+//    public static void main(String[] args) {
+//        List<String> list = new ArrayList<String>();
+//        list.add("192.168.1.10:8899");
+//        list.add("192.168.1.11:8899");
+//        list.add("192.168.1.12:8899");
+//
+//        LoadBalance lb = LoadBalanceFactory.getDefault();
+//        System.out.println(lb.select(list));
+//    }
 }

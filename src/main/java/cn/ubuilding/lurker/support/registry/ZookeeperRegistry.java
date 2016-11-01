@@ -1,6 +1,5 @@
 package cn.ubuilding.lurker.support.registry;
 
-import cn.ubuilding.lurker.support.LurkerListener;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ public class ZookeeperRegistry implements Registry {
     private static final Logger logger = LoggerFactory.getLogger(ZookeeperRegistry.class);
 
     private ZkClient zkClient;
-
 
     /**
      * zookeeper(注册中心) 地址，格式:
@@ -54,7 +52,6 @@ public class ZookeeperRegistry implements Registry {
         }
     }
 
-
     public void unRegister(String serviceName, String serviceAddress) {
         zkClient.delete(completePath(serviceName + "/" + serviceAddress));
     }
@@ -68,10 +65,10 @@ public class ZookeeperRegistry implements Registry {
      * zookeeper节点发生变化时触发
      */
     @SuppressWarnings("unchecked")
-    public void addListener(String serviceName, final LurkerListener changer) {
+    public void addListener(final String serviceName, final RegistryChanger changer) {
         zkClient.subscribeChildChanges(completePath(serviceName), new IZkChildListener() {
-            public void handleChildChange(String servicePath, List<String> addressPaths) throws Exception {
-                changer.onChange(addressPaths);
+            public void handleChildChange(String servicePath, List<String> addressList) throws Exception {
+                changer.onChange(serviceName, addressList);
             }
         });
     }
@@ -92,5 +89,18 @@ public class ZookeeperRegistry implements Registry {
     private String completePath(String childPath) {
         return "/lurker/" + childPath;
     }
+
+//    public static void main(String[] args) {
+//        ZookeeperRegistry registry = new ZookeeperRegistry("localhost:2181");
+//        registry.addListener("helloService_1.0", new LurkerChanger<String, List<String>>() {
+//            public void onChange(String serviceName, List<String> event) {
+//                System.out.println(">>>>>" + event);
+//            }
+//        });
+//
+//        while (true) {
+//
+//        }
+//    }
 
 }

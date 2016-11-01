@@ -1,7 +1,5 @@
 package cn.ubuilding.lurker.support.registry;
 
-import cn.ubuilding.lurker.support.LurkerListener;
-
 import java.util.List;
 
 /**
@@ -23,7 +21,7 @@ public class RedisRegistry implements Registry {
 
     }
 
-    public void addListener(String serviceName, LurkerListener listener) {
+    public void addListener(String serviceName, RegistryChanger listener) {
 
     }
 

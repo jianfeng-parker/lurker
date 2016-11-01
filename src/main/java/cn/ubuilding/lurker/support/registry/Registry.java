@@ -1,8 +1,6 @@
 package cn.ubuilding.lurker.support.registry;
 
 
-import cn.ubuilding.lurker.support.LurkerListener;
-
 import java.util.List;
 
 /**
@@ -35,7 +33,7 @@ public interface Registry {
      */
     void unRegister(String serviceName, String serviceAddress);
 
-    void addListener(String serviceName, LurkerListener listener);
+    void addListener(String serviceName, RegistryChanger listener);
 
     /**
      * 验证注册中心地址是否合法

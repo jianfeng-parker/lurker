@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 16/4/2 17:43
  */
 
-public final class ConsumerHandler extends ChannelInboundHandlerAdapter {
+public final class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private Map<String, ResponseFuture> futures = new ConcurrentHashMap<String, ResponseFuture>();
 
