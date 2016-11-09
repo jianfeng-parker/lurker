@@ -1,13 +1,16 @@
-package cn.ubuilding.lurker.client;
+package cn.ubuilding.lurker.support.rpc.protocol;
 
-import cn.ubuilding.lurker.support.rpc.protocol.Request;
-import cn.ubuilding.lurker.support.rpc.protocol.Response;
+import cn.ubuilding.lurker.client.Client;
+import cn.ubuilding.lurker.support.rpc.AsyncCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Wu Jianfeng
@@ -25,6 +28,10 @@ public final class ResponseFuture implements Future<Response> {
     private Mutex mutex;
 
     private long startTime;
+
+    private List<AsyncCallback> pendingCallback = new ArrayList<AsyncCallback>();
+
+    private ReentrantLock lock = new ReentrantLock();
 
     public ResponseFuture(Request request) {
         this.request = request;
@@ -50,18 +57,30 @@ public final class ResponseFuture implements Future<Response> {
 
     /**
      * 在Handler中收到服务端数据后触发此动作(方法)
-     *
-     * @param response
      */
     public void done(Response response) {
         long doneTime = System.currentTimeMillis();
         this.response = response;
         this.mutex.release(1);
-        // TODO  此处还可以执行其它逻辑
+        runPendingCallback();
         if (doneTime - this.startTime > 3000) {
             logger.info("the request(" + request.getId() + ") is so slowly");
         }
 
+    }
+
+    public ResponseFuture addCallback(AsyncCallback callback) {
+        lock.lock();
+        try {
+            if (isDone()) {
+                runCallback(callback);
+            } else {
+                this.pendingCallback.add(callback);
+            }
+        } finally {
+            lock.unlock();
+        }
+        return this;
     }
 
     public boolean isDone() {
@@ -78,6 +97,31 @@ public final class ResponseFuture implements Future<Response> {
 
     public boolean isCancelled() {
         throw new UnsupportedOperationException();
+    }
+
+    private void runPendingCallback() {
+        lock.lock();
+        try {
+            for (final AsyncCallback callback : pendingCallback) {
+                runCallback(callback);
+            }
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    private void runCallback(final AsyncCallback callback) {
+        final Response res = this.response;
+        Client.submit(new Runnable() {
+            public void run() {
+                Throwable t = res.getError();
+                if (null == t) {
+                    callback.success(res.getResult());
+                } else {
+                    callback.fail(t);
+                }
+            }
+        });
     }
 
     static class Mutex extends AbstractQueuedSynchronizer {

@@ -1,10 +1,10 @@
 package cn.ubuilding.lurker.client;
 
 import cn.ubuilding.lurker.support.rpc.protocol.Response;
+import cn.ubuilding.lurker.support.rpc.protocol.ResponseFuture;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 
-import java.net.SocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,11 +17,7 @@ public final class ClientHandler extends ChannelInboundHandlerAdapter {
 
     private Map<String, ResponseFuture> futures = new ConcurrentHashMap<String, ResponseFuture>();
 
-    private Throwable error;
-
     private Channel channel;
-
-    private SocketAddress serverAddress;
 
     public void addFuture(ResponseFuture future) {
         if (null == future) throw new NullPointerException("ResponseFuture");
@@ -43,7 +39,6 @@ public final class ClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         super.channelActive(ctx);
-        this.serverAddress = this.channel.remoteAddress();
     }
 
     @Override
@@ -53,7 +48,6 @@ public final class ClientHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        this.error = cause;
         ctx.close();
     }
 

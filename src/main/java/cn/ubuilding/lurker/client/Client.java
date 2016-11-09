@@ -1,5 +1,7 @@
 package cn.ubuilding.lurker.client;
 
+import cn.ubuilding.lurker.client.proxy.AsyncRemoteProxy;
+import cn.ubuilding.lurker.client.proxy.RemoteProxyInvocation;
 import cn.ubuilding.lurker.support.registry.RegistryChanger;
 import cn.ubuilding.lurker.support.loadbalance.LoadBalanceFactory;
 import cn.ubuilding.lurker.support.registry.Registry;
@@ -7,7 +9,7 @@ import cn.ubuilding.lurker.support.registry.ZookeeperRegistry;
 import net.sf.cglib.proxy.Proxy;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 /**
  * @author Wu Jianfeng
@@ -19,9 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class Client {
 
     /**
-     * remote服务地址
+     * 缓存remote服务地址
      */
     private static ConcurrentHashMap<String, List<String>> addresses = new ConcurrentHashMap<String, List<String>>();
+
+    // TODO 线程池初始化计算公式
+    private static ExecutorService executor = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors(),
+            600L, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>());
 
     private Registry registry;
 
@@ -58,7 +65,20 @@ public final class Client {
      * 返回一个目标服务接口的代理实例
      */
     @SuppressWarnings("unchecked")
-    public <T> T create(Class<?> interfaceClass) {
+    public <T> T create(Class<T> interfaceClass) {
+        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
+                new Class<?>[]{interfaceClass}, buildProxyInvocation(interfaceClass));
+    }
+
+    public <T> AsyncRemoteProxy createAsync(Class<T> interfaceClass) {
+        return buildProxyInvocation(interfaceClass);
+    }
+
+    public void stop() {
+        // TODO stop...
+    }
+
+    private <T> RemoteProxyInvocation buildProxyInvocation(Class<T> interfaceClass) {
         if (null == interfaceClass) {
             throw new IllegalArgumentException("interface class must not be null");
         }
@@ -72,20 +92,24 @@ public final class Client {
                 addrList = addresses.get(interfaceClass.getName());
             }
         }
-
         // invocation内部持有远程连接，并实现远程通信
         // 将invocation赋予Changer实例是便于 Changer监听到Registry发生变化后可以更新invocation内部连接等信息
-        RemoteServiceInvocation invocation = new RemoteServiceInvocation(interfaceClass.getName(), addrList, loadBalance);
+        RemoteProxyInvocation invocation = new RemoteProxyInvocation(interfaceClass.getName(), addrList, loadBalance);
         registry.addListener(interfaceClass.getName(), new RemoteAddressChanger(invocation));
-        return (T) Proxy.newProxyInstance(interfaceClass.getClassLoader(),
-                new Class<?>[]{interfaceClass}, invocation);
+        return invocation;
+    }
+
+    public static void submit(Runnable command) {
+        if (null != command) {
+            executor.submit(command);
+        }
     }
 
     private class RemoteAddressChanger implements RegistryChanger<String, List<String>> {
 
-        private RemoteServiceInvocation invocation;
+        private RemoteProxyInvocation invocation;
 
-        public RemoteAddressChanger(RemoteServiceInvocation invocation) {
+        public RemoteAddressChanger(RemoteProxyInvocation invocation) {
             this.invocation = invocation;
         }
 
