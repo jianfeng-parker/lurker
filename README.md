@@ -48,10 +48,10 @@
 
 * Client端:
 
-1. 添加依赖
+  添加依赖
 
 ```xml
-  <!--添加依赖-->
+
   <dependency>
       <groupId>cn.ubuilding.lurker</groupId>
       <artifactId>lurker-rpc</artifactId>
@@ -59,7 +59,7 @@
   </dependency>
 
 ```
-2. 远程接口调用：
+  远程接口调用：
 
 ```java
     
@@ -98,7 +98,7 @@
 ```
 * Server端:
 
-1. 添加依赖
+  添加依赖
 
 ```xml
   
@@ -110,7 +110,7 @@
 
 ```
 
-2. 服务实现:
+  服务实现:
 
 ```java
 
@@ -134,7 +134,7 @@
    
 ```
 
-3. 服务发布方式1：
+  服务发布方式1：
 
 ```java
   
@@ -156,7 +156,7 @@
 
 ```
 
-4. 服务发布方式2：
+  服务发布方式2：
 
 ```xml
 
