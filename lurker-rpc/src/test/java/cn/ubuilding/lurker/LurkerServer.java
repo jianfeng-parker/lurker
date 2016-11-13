@@ -5,9 +5,6 @@ package cn.ubuilding.lurker;
 
 import cn.ubuilding.lurker.server.Server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * @author Wu Jianfeng
  * @since 16/4/16 15:20
