@@ -8,7 +8,7 @@
 
 > * 序列化工具: protostuff, Version: 1.3.8
 
-#### Client:
+#### Client
 
 > * 创建Client实例用于生成远程服务代理:同步/异步
 
@@ -18,7 +18,7 @@
 
 > * 向远程服务发送请求并接受返回结果
 
-#### Server:
+#### Server
 
 > * 创建Server实例
 
@@ -30,9 +30,9 @@
 
 > * 接受客户端的连接，并返回服务执行结果
 
-#### 使用示例:
+#### 使用示例
 
-##### 1.公共接口定义:
+##### 1.公共接口定义
 
 ```java
 
@@ -46,7 +46,7 @@
      
 ```
 
-##### 2.Client端:
+##### 2.Client端
 
 *  添加依赖
 
@@ -60,19 +60,19 @@
 
 ```
 
-* 远程接口调用：
+* 远程接口调用
 
 ```java
     
    public class XXBizService{
    
-     public String bizMethod(){
+     public void bizMethod(){
          // 初始化Client实例，传入Registry地址
          Client client = new Client("127.0.0.1:2181");
          
          // 创建服务代理，执行同步请求
          HelloService helloService = client.create(HelloService.class);
-         return helloService.say("Parker");
+         helloService.say("Parker");
          
          // 创建异步代理，执行异步请求
          AsyncRemoteProxy proxy = client.createAsync(HelloService.class);
@@ -97,7 +97,7 @@
    }
   
 ```
-##### 3.Server端:
+##### 3.Server端
 
 *  添加依赖
 
@@ -135,7 +135,7 @@
    
 ```
 
-* 服务发布方式1：
+* 服务发布方式1
 
 ```java
   
@@ -157,7 +157,7 @@
 
 ```
 
-*  服务发布方式2：
+*  服务发布方式2
 
 ```xml
 
@@ -186,6 +186,10 @@
 ```
 
 ### LurkerHTTP
+
+> * HTTP ...
+
+> * HTTP ...
 
 
 
