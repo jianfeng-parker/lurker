@@ -75,7 +75,8 @@ public final class Client {
     }
 
     public void stop() {
-        // TODO stop...
+        executor.shutdown();
+        registry.close();
     }
 
     private <T> RemoteProxyInvocation buildProxyInvocation(Class<T> interfaceClass) {

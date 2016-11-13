@@ -4,6 +4,7 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
+
     <bean id="helloService" class="cn.ubuilding.lurker.application.provider.impl.HelloServiceImpl"/>
 
     <bean id="doSomethingService" class="cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl"/>
@@ -12,8 +13,18 @@
         <constructor-arg value="localhost:2181"/>
     </bean>
 
-    <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server">
-        <constructor-arg type="cn.ubuilding.lurker.support.registry.Registry" ref="zkRegistry"/>
+    <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server" init-method="start">
+        <!--服务暴露端口-->
+        <property name="port" value="8899"/>
+        <!--服务注册中心-->
+        <property name="registry" ref="zkRegistry"/>
+        <!--RPC服务-->
+        <property name="services">
+            <list>
+                <ref bean="helloService"/>
+                <ref bean="doSomethingService"/>
+            </list>
+        </property>
     </bean>
 
 </beans>

@@ -28,4 +28,8 @@ public class RedisRegistry implements Registry {
     public void check() {
         // TODO 做一些注册中心相关的校验
     }
+
+    public void close() {
+
+    }
 }

@@ -2,9 +2,9 @@ package cn.ubuilding.lurker.client;
 
 import cn.ubuilding.lurker.support.codec.Decoder;
 import cn.ubuilding.lurker.support.codec.Encoder;
-import cn.ubuilding.lurker.support.rpc.protocol.Request;
-import cn.ubuilding.lurker.support.rpc.protocol.Response;
-import cn.ubuilding.lurker.support.rpc.protocol.ResponseFuture;
+import cn.ubuilding.lurker.support.protocol.Request;
+import cn.ubuilding.lurker.support.protocol.Response;
+import cn.ubuilding.lurker.support.protocol.ResponseFuture;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.channel.*;

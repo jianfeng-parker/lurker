@@ -25,10 +25,21 @@ public class ZookeeperRegistry implements Registry {
      * "host1:port1,host2:port2"
      */
     public ZookeeperRegistry(String zkAddress) {
+        this(zkAddress, 3000);
+    }
+
+    /**
+     * @param zkAddress zookeeper服务地址
+     * @param timeout   连接ZK超时时间:毫秒
+     */
+    public ZookeeperRegistry(String zkAddress, int timeout) {
         if (null == zkAddress || zkAddress.length() == 0) {
-            throw new IllegalArgumentException("registry address is invalid");
+            throw new IllegalArgumentException("invalid registry address");
         }
-        this.zkClient = new ZkClient(zkAddress);
+        if (timeout < 0) {
+            throw new IllegalArgumentException("invalid timeout");
+        }
+        this.zkClient = new ZkClient(zkAddress, timeout);
     }
 
     /**
@@ -75,6 +86,10 @@ public class ZookeeperRegistry implements Registry {
 
     public void check() {
         // TODO 做一些校验，如zookeeper地址格式...
+    }
+
+    public void close() {
+        zkClient.close();
     }
 
     private boolean exist(String path) {

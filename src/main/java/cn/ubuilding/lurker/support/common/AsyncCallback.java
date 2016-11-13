@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.support.rpc;
+package cn.ubuilding.lurker.support.common;
 
 /**
  * @author Wu Jianfeng

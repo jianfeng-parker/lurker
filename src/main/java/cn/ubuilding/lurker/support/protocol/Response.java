@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.support.rpc.protocol;
+package cn.ubuilding.lurker.support.protocol;
 
 /**
  * @author Wu Jianfeng

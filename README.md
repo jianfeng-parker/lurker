@@ -1,6 +1,6 @@
 ### 基于Netty实现的RPC框架
 
-> * 网络通讯框架: Netty, Version: 4.0.35.Final
+> * 网络通讯框架: Netty, Version: 4.1.16.Final
 
 > * 服务注册中心: ZooKeeper, Version: 3.4.6
 
@@ -8,23 +8,27 @@
 
 ------
 
-### Consumer(Client):
+#### Client:
 
-> * 通过创建Consumer实例生成目标服务接口的代理
+> * 创建Client实例用于生成远程服务代理:同步/异步
 
-> * 创建Consumer实例时允许调用者传入基于Discovery接口自定义的实现类用于发现远程服务地址
+> * 创建Client实例时传入Registry用于发现远程服务地址
 
-> * 动态监听远程服务地址的变化
+> * 监听远程服务地址变化,更新连接
 
 > * 向远程服务发送请求并接受返回结果
 
-### Provider(Server):
+#### Server:
 
-> * 调用者通过ServerBoot实例将需要对外提供服务的接口实现类注册到Server中；
+> * 创建Server实例
 
-> * 向注册中心(Zookeeper/Redis)注册服务地址等信息；
+> * 监听端口
 
-> * 接受客户端的连接；
+> * 发布RPC服务实例
+
+> * 向注册中心(Zookeeper/Redis)注册服务
+
+> * 接受客户端的连接，并返回服务执行结果
 
 #### 使用示例:
 
@@ -42,7 +46,7 @@
      
 ```
 
-##### Consumer(Client)端:
+##### Client端:
 
 ```xml
   <!--添加依赖-->
@@ -56,26 +60,41 @@
 ###### 远程接口调用：
 
 ```java
+    
+   public class XXBizService{
    
-  /**
-   * serviceName: 由服务发布方提供，即可以唯一标识服务的值，Consumer端使用该key从注册中心获取服务相关信息
-   */  
-   public class XXService{
-   
-     // 初始化Consumer实例时传递一个key，即使用默认的Discover(from zookeeper)获取远程服务信息
-     // 效果等同于new Consumer(new DefaultDiscovery(serviceName), HelloService.class).instance();
-     // 也可以使用从Redis获取服务信息Discovery:new Consumer(new RedisDiscovery(serviceName), HelloService.class).instance()
-     // 也可以使用自定义的Discovery，实现Discovery接口即可
-     // 具体到哪里获取服务信息，取决于服务端将服务信息发布到哪里
-     public String sayHello(String name){
-         HelloService helloService = new Consumer(serviceName, HelloService.class).instance();
+     public String bizMethod(){
+         // 初始化Client实例，传入Registry地址
+         Client client = new Client("127.0.0.1:2181");
+         
+         // 创建服务代理，执行同步请求
+         HelloService helloService = client.create(HelloService.class);
          return helloService.say("Parker");
+         
+         // 创建异步代理，执行异步请求
+         AsyncRemoteProxy proxy = client.createAsync(HelloService.class);
+         // 方法名，参数值
+         ResponseFuture future = proxy.call("say","Parker");
+         String result = (String)future.get(); // get(3000, TimeUnit.MILLISECONDS);
+         
+         // 异步执行对调
+         AsyncRemoteProxy proxy2 = client.createAsync(HelloService.class);
+         // 方法名，参数值
+         ResponseFuture future2 = proxy2.call("say","Parker");
+         future2.addCallback(new AsyncCallback(){
+             public void success(Object result){
+                 // TODO ...
+             }
+             public void fail(Throwable t){
+                 // TODO ...
+             }
+         });
      }
      
    }
   
 ```
-##### Provider(Server)端:
+##### Server端:
 
 ```xml
   
@@ -88,80 +107,79 @@
 
 ```
 
+###### 服务实现:
+
 ```java
 
   /**
-   * 接口实现
+   * 加 @Rpc标签 表示该类需要发布为RPC服务
+   * 标签值为必填项，用于指定RPC服务接口类，因为一个类可能实现多个接口
    */
+   @Rpc(HelloService.class)
    public class HelloServiceImpl implements HelloService{
      public String say(String name){
        return "hello "+name;
      }
    }
    
+   @Rpc(DoSomethingService.class)
+   public class DoSomethingServiceImpl implements DoSomethingService {
+       public void doSomething() {
+           System.out.println("do something...");
+       }
+   }
+   
 ```
 
-###### 接口发布方式1：
+###### 服务发布方式1：
 
 ```java
   
-  public class XXService{
+  /*
+   * 初始化一个Server实例，指定注册中心
+   * 其它初始化参数见代码
+   */ 
+  Server server = new Server("127.0.0.1:2181");
+  server.addService(helloService);
+  // or
+  List<Object> services = new ArrayList<Object>();
+  services.add(helloService);
+  services.add(somethingService);
   
-       @Autowired
-       private HelloServiceImpl helloService;
-       
-       /**
-        * Java代码方式发布RPC服务
-        */
-       public void publish(){
-           List<Provider> providers = new ArrayList<Provider>();
-           providers.add(new Provider(serviceName,helloService));
-           // providers.add(发布的其它服务);
-           new Server("127.0.0.1",providers).start();
-       }
-  }
+  server.addService(services);
+  
+  server.start();
+  
 
 ```
 
-###### 接口发布方式2：
+###### 服务发布方式2：
 
 ```xml
 
   <bean id="helloService" class="cn.ubuilding.lurker.application.provider.impl.HelloServiceImpl"/>
   
   <bean id="doSomethingService" class="cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl"/>
-
-  <!--spring配置文件的方式发布RPC服务-->
-  <bean id="rpcServer" class="cn.ubuilding.lurker.provider.Server" init-method="start">
-          <!--rpc服务暴露地址-->
-          <constructor-arg index="0" value=" 127.0.0.1"/>
-          <!--rpc服务暴露端口-->
-          <constructor-arg index="1" value="8899"/>
-          <!--暴露的rpc服务列表-->
-          <constructor-arg index="2">
-              <list>
-                  <bean class="cn.ubuilding.lurker.provider.Provider">
-                      <!--唯一标识服务的key,客户端根据该key从注册中心获取前面配置的rpc服务地址-->
-                      <property name="serviceName" value="helloService_1.0"/>
-                      <!--rpc服饰实现者-->
-                      <property name="implementation" ref="helloService"/>
-                  </bean>
-                  <bean class="cn.ubuilding.lurker.provider.Provider">
-                      <property name="serviceName" value="doSomethingService_1.0"/>
-                      <property name="implementation" ref="doSomethingService"/>
-                  </bean>
-              </list>
-          </constructor-arg>
-          <!--注册中心地址(默认使用zookeeper)-->
-          <constructor-arg index="3" value="127.0.0.1:2181"/>
+  
+  <bean id="zkRegistry" class="cn.ubuilding.lurker.support.registry.ZookeeperRegistry">
+        <constructor-arg value="localhost:2181"/>
+  </bean>
+  
+  <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server" init-method="start">
+        <!--服务暴露端口-->
+        <property name="port" value="8899"/>
+        <!--服务注册中心-->
+        <property name="registry" ref="zkRegistry"/>
+        <!--RPC服务-->
+        <property name="services">
+            <list>
+                <ref bean="helloService"/>
+                <ref bean="doSomethingService"/>
+            </list>
+        </property>
   </bean>
 
 ```
 
-### 基于Netty实现的RPC框架(V2)
-
-> * v2版本的实现代码在package:v2中
-> * 用户通过扩展的spring标签配置RPC服务信息;
-> * 启动服务(Netty)未实现；客户端(consumer/refer)未实现；
 
 

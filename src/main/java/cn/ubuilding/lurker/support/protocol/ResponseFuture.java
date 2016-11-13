@@ -1,7 +1,7 @@
-package cn.ubuilding.lurker.support.rpc.protocol;
+package cn.ubuilding.lurker.support.protocol;
 
 import cn.ubuilding.lurker.client.Client;
-import cn.ubuilding.lurker.support.rpc.AsyncCallback;
+import cn.ubuilding.lurker.support.common.AsyncCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @since 16/4/10 16:05
  */
 
-public final class ResponseFuture implements Future<Response> {
+public final class ResponseFuture implements Future<Object> {
 
     private static final Logger logger = LoggerFactory.getLogger(ResponseFuture.class);
 
@@ -39,16 +39,27 @@ public final class ResponseFuture implements Future<Response> {
         startTime = System.currentTimeMillis();
     }
 
-    public Response get() {
+    public Object get() {
         mutex.acquire(-1);
-        return this.response;
+        if (null != this.response) {
+            return this.response.getResult();
+        } else {
+            return null;
+        }
     }
 
-    public Response get(long timeout, TimeUnit unit) {
+    public Object get(long timeout, TimeUnit unit) {
         try {
             boolean success = mutex.tryAcquireNanos(-1, unit.toNanos(timeout));
-            if (success) return this.response;
-            else throw new RuntimeException("time out to get response for request id(" + this.request.getId() + ")");
+            if (success) {
+                if (null != this.response) {
+                    return this.response.getResult();
+                } else {
+                    return null;
+                }
+            } else {
+                throw new RuntimeException("time out to get response for request id(" + this.request.getId() + ")");
+            }
         } catch (InterruptedException e) {
             logger.error("get response for request(" + request.getId() + ") from future failure:" + e.getMessage());
             return null;

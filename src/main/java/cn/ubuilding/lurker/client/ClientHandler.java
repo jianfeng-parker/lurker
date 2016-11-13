@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.client;
 
-import cn.ubuilding.lurker.support.rpc.protocol.Response;
-import cn.ubuilding.lurker.support.rpc.protocol.ResponseFuture;
+import cn.ubuilding.lurker.support.protocol.Response;
+import cn.ubuilding.lurker.support.protocol.ResponseFuture;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 

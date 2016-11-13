@@ -4,9 +4,8 @@ import cn.ubuilding.lurker.client.Connection;
 import cn.ubuilding.lurker.support.NetUtils;
 import cn.ubuilding.lurker.support.loadbalance.LoadBalance;
 import cn.ubuilding.lurker.support.loadbalance.LoadBalanceFactory;
-import cn.ubuilding.lurker.support.rpc.protocol.Request;
-import cn.ubuilding.lurker.support.rpc.protocol.Response;
-import cn.ubuilding.lurker.support.rpc.protocol.ResponseFuture;
+import cn.ubuilding.lurker.support.protocol.Request;
+import cn.ubuilding.lurker.support.protocol.ResponseFuture;
 import net.sf.cglib.proxy.InvocationHandler;
 
 import java.lang.reflect.Method;
@@ -20,23 +19,22 @@ import java.util.UUID;
 
 public class RemoteProxyInvocation implements InvocationHandler, AsyncRemoteProxy {
 
-    private String serviceName;
+    private String interfaceClassName;
 
     private List<String> addressList;
 
     private String loadBalance;
 
-    // TODO 定时检查Connection的可用性
     private Connection connection;
 
-    public RemoteProxyInvocation(String serviceName, List<String> addressList, String loadBalance) {
-        this.serviceName = serviceName;
+    public RemoteProxyInvocation(String interfaceClassName, List<String> addressList, String loadBalance) {
+        this.interfaceClassName = interfaceClassName;
         this.addressList = addressList;
         this.loadBalance = loadBalance;
         initConnection();
     }
 
-    public Response invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Request request = buildRequest(method.getName(), args);
         request.setParameterTypes(method.getParameterTypes());
         ResponseFuture future = connection.send(request);
@@ -57,7 +55,7 @@ public class RemoteProxyInvocation implements InvocationHandler, AsyncRemoteProx
     private Request buildRequest(String methodName, Object... args) {
         Request request = new Request();
         request.setId(UUID.randomUUID().toString());
-        request.setServiceName(serviceName);
+        request.setInterfaceClassName(interfaceClassName);
         request.setMethodName(methodName);
         request.setParameters(args);
         return request;
@@ -78,7 +76,7 @@ public class RemoteProxyInvocation implements InvocationHandler, AsyncRemoteProx
      */
     private void initConnection() {
         if (null == this.addressList || this.addressList.size() == 0) {
-            throw new IllegalStateException("not found any remote address for service:" + this.serviceName);
+            throw new IllegalStateException("not found any remote address for service:" + this.interfaceClassName);
         }
         LoadBalance lb = (this.loadBalance == null || this.loadBalance.length() == 0) ?
                 LoadBalanceFactory.getDefault() : LoadBalanceFactory.get(this.loadBalance);

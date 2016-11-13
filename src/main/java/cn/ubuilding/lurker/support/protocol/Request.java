@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.support.rpc.protocol;
+package cn.ubuilding.lurker.support.protocol;
 
 /**
  * @author Wu Jianfeng
@@ -9,7 +9,7 @@ public class Request {
 
     private String id;
 
-    private String serviceName;
+    private String interfaceClassName;
 
     private String methodName;
 
@@ -25,12 +25,12 @@ public class Request {
         this.id = id;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getInterfaceClassName() {
+        return interfaceClassName;
     }
 
-    public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+    public void setInterfaceClassName(String interfaceClassName) {
+        this.interfaceClassName = interfaceClassName;
     }
 
     public String getMethodName() {

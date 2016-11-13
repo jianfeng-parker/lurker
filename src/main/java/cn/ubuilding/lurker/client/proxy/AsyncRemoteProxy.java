@@ -1,6 +1,6 @@
 package cn.ubuilding.lurker.client.proxy;
 
-import cn.ubuilding.lurker.support.rpc.protocol.ResponseFuture;
+import cn.ubuilding.lurker.support.protocol.ResponseFuture;
 
 /**
  * @author Wu Jianfeng

@@ -40,4 +40,6 @@ public interface Registry {
      */
     void check();
 
+    void close();
+
 }

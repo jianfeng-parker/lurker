@@ -1,7 +1,7 @@
 package cn.ubuilding.lurker.server;
 
-import cn.ubuilding.lurker.support.rpc.protocol.Request;
-import cn.ubuilding.lurker.support.rpc.protocol.Response;
+import cn.ubuilding.lurker.support.protocol.Request;
+import cn.ubuilding.lurker.support.protocol.Response;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import net.sf.cglib.reflect.FastClass;
@@ -48,17 +48,17 @@ public final class ServerHandler extends ChannelInboundHandlerAdapter {
 
     private Response handle(Request request) {
         try {
-            Object service = services.get(request.getServiceName());
-            if (null == service) {
-                return new Response(request.getId(), null, new ClassNotFoundException("not found any services by serviceKey:" + request.getServiceName()));
+            Object serviceImpl = services.get(request.getInterfaceClassName());
+            if (null == serviceImpl) {
+                return new Response(request.getId(), null, new ClassNotFoundException("not found any implementation of interface:" + request.getInterfaceClassName()));
             }
-            Class<?> serviceClass = service.getClass();
+            Class<?> serviceClass = serviceImpl.getClass();
             String methodName = request.getMethodName();
             Class<?>[] parameterTypes = request.getParameterTypes();
             Object[] parameters = request.getParameters();
             FastClass serviceFastClass = FastClass.create(serviceClass);
             FastMethod fastMethod = serviceFastClass.getMethod(methodName, parameterTypes);
-            return new Response(request.getId(), fastMethod.invoke(service, parameters), null);
+            return new Response(request.getId(), fastMethod.invoke(serviceImpl, parameters), null);
         } catch (Throwable t) {
             return new Response(request.getId(), null, t);
         }
