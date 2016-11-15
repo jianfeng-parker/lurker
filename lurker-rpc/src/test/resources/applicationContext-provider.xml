@@ -5,15 +5,15 @@
                         http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 
-    <bean id="helloService" class="cn.ubuilding.lurker.application.provider.impl.HelloServiceImpl"/>
+    <bean id="helloService" class="cn.ubuilding.rpc.application.provider.impl.HelloServiceImpl"/>
 
-    <bean id="doSomethingService" class="cn.ubuilding.lurker.application.provider.impl.DoSomethingServiceImpl"/>
+    <bean id="doSomethingService" class="cn.ubuilding.rpc.application.provider.impl.DoSomethingServiceImpl"/>
 
-    <bean id="zkRegistry" class="cn.ubuilding.lurker.support.registry.ZookeeperRegistry">
+    <bean id="zkRegistry" class="cn.ubuilding.rpc.support.registry.ZookeeperRegistry">
         <constructor-arg value="localhost:2181"/>
     </bean>
 
-    <bean id="rpcServer" class="cn.ubuilding.lurker.server.Server" init-method="start">
+    <bean id="rpcServer" class="cn.ubuilding.rpc.server.Server" init-method="start">
         <!--服务暴露端口-->
         <property name="port" value="8899"/>
         <!--服务注册中心-->
