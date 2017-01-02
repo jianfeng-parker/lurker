@@ -1,6 +1,5 @@
 package cn.ubuilding.lurker.http;
 
-import cn.ubuilding.lurker.http.core.Controller;
 import cn.ubuilding.lurker.http.core.router.Dispatcher;
 import cn.ubuilding.lurker.http.core.router.Router;
 import cn.ubuilding.lurker.http.support.utils.NetUtils;
@@ -69,7 +68,7 @@ public final class HttpServer {
     /**
      * 业务Controller
      */
-    public HttpServer addActions(Controller... controllers) {
+    public HttpServer addActions(Object... controllers) {
         this.router = new Router(controllers);
         return this;
     }

@@ -1,7 +1,6 @@
 package cn.ubuilding.lurker.http.core.router;
 
 import cn.ubuilding.lurker.http.annotation.Path;
-import cn.ubuilding.lurker.http.core.Controller;
 import cn.ubuilding.lurker.http.core.Render;
 import cn.ubuilding.lurker.http.core.processor.GetRequestProcessor;
 import cn.ubuilding.lurker.http.core.processor.PostRequestProcessor;
@@ -22,9 +21,9 @@ public final class Router {
 
     private static ConcurrentMap<String, ConcurrentMap<String, RequestProcessor>> mapper = new ConcurrentHashMap<String, ConcurrentMap<String, RequestProcessor>>();
 
-    public Router(Controller... controllers) {
+    public Router(Object... controllers) {
         if (controllers != null && controllers.length > 0) {
-            for (Controller controller : controllers) {
+            for (Object controller : controllers) {
                 Path controllerPath = controller.getClass().getAnnotation(Path.class);
                 String basePath = "";
                 if (null != controllerPath) {
@@ -44,6 +43,9 @@ public final class Router {
                                 relativePath = "/" + relativePath;
                             }
                             absolutePath += relativePath;
+                        }
+                        if (absolutePath.length() == 0) {
+                            continue;
                         }
                         HttpMethod httpMethod = null == annotation ? HttpMethod.GET : annotation.method().getMethod();
                         if (HttpMethod.GET.equals(httpMethod)) {

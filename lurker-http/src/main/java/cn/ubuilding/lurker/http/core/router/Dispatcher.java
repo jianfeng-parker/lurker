@@ -2,7 +2,7 @@ package cn.ubuilding.lurker.http.core.router;
 
 import cn.ubuilding.lurker.http.core.Render;
 import cn.ubuilding.lurker.http.core.processor.RequestProcessor;
-import cn.ubuilding.lurker.http.support.HttpUtils;
+import cn.ubuilding.lurker.http.support.utils.HttpUtils;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

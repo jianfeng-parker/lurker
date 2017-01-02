@@ -1,4 +1,4 @@
-package cn.ubuilding.lurker.http.support;
+package cn.ubuilding.lurker.http.support.utils;
 
 import java.util.HashMap;
 import java.util.List;

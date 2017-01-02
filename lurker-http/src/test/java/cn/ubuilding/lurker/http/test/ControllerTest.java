@@ -1,7 +1,6 @@
 package cn.ubuilding.lurker.http.test;
 
 import cn.ubuilding.lurker.http.annotation.*;
-import cn.ubuilding.lurker.http.core.Controller;
 import cn.ubuilding.lurker.http.core.HttpMethod;
 import cn.ubuilding.lurker.http.core.Render;
 import cn.ubuilding.lurker.http.core.RenderType;
@@ -13,7 +12,7 @@ import cn.ubuilding.lurker.http.test.model.TestUser;
  */
 
 @Path("/v1/user")
-public class ControllerTest implements Controller {
+public class ControllerTest {
 
     @Path(value = "/hello1", produce = "json", method = HttpMethod.GET)
     public Render hello1(@RequestParam(name = "name") String name, @RequestParam(name = "age") int age, String address) {

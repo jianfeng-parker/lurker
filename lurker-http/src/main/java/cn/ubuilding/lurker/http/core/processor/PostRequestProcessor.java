@@ -4,7 +4,7 @@ import cn.ubuilding.lurker.http.annotation.RequestBody;
 import cn.ubuilding.lurker.http.annotation.RequestParam;
 import cn.ubuilding.lurker.http.exception.RequestHandleException;
 import cn.ubuilding.lurker.http.support.ContentType;
-import cn.ubuilding.lurker.http.support.HttpUtils;
+import cn.ubuilding.lurker.http.support.utils.HttpUtils;
 import cn.ubuilding.lurker.http.support.utils.BeanUtils;
 import com.alibaba.fastjson.JSON;
 import io.netty.handler.codec.http.HttpResponseStatus;

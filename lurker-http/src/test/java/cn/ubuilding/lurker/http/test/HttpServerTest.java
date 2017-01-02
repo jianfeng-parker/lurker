@@ -12,7 +12,7 @@ public class HttpServerTest {
 
     public static void main(String[] args) {
         HttpServer server = new HttpServer();
-        server.setKeepAlive(true).addActions(new ControllerTest()).start();
+        server.setKeepAlive(true).addActions(new ControllerTest(), new Controller2Test()).start();
     }
 
 }
