@@ -13,8 +13,6 @@ public interface RequestProcessor {
 
     Render process(Map<String, String> parameters);
 
-    Render process(Map<String, String> parameters, String requestBody);
-
     Render process(Map<String, String> parameters, String requestBody, String contentType);
 
 }
