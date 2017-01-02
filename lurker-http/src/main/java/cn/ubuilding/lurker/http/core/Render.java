@@ -16,8 +16,8 @@ public class Render {
 
     private HttpResponseStatus status;
 
-    public Render(RenderType type, HttpResponseStatus status) {
-        this("", type, status);
+    public Render(String data, RenderType type) {
+        this(data, type, HttpResponseStatus.OK);
     }
 
     public Render(String data, RenderType type, HttpResponseStatus status) {
@@ -44,6 +44,14 @@ public class Render {
 //                response.setStatus(HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
         return response;
+    }
+
+    public static Render text(String text, HttpResponseStatus status) {
+        return new Render(text, RenderType.TEXT, status);
+    }
+
+    public static Render text(HttpResponseStatus status) {
+        return text(status.reasonPhrase(), status);
     }
 
 }

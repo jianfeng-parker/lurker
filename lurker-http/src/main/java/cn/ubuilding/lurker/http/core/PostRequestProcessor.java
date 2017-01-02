@@ -1,6 +1,8 @@
 package cn.ubuilding.lurker.http.core;
 
+import cn.ubuilding.lurker.http.annotation.RequestBody;
 import cn.ubuilding.lurker.http.annotation.RequestParam;
+import com.alibaba.fastjson.JSON;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.lang.annotation.Annotation;
@@ -16,13 +18,13 @@ import java.util.Map;
  * @since 2016/12/4 11:05
  */
 
-public class ControllerHandler {
+public class PostRequestProcessor {
 
     private Object controller;
 
     private Method method;
 
-    public ControllerHandler(Object controller, Method method) {
+    public PostRequestProcessor(Object controller, Method method) {
         this.controller = controller;
         this.method = method;
     }
@@ -30,7 +32,6 @@ public class ControllerHandler {
     public Render handle(Map<String, String> parameters) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         Annotation[][] annotations = method.getParameterAnnotations();
-        ((RequestParam) annotations[1][0]).name();
         Object[] parameterValues = new Object[parameterTypes.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> type = parameterTypes[i];
@@ -42,10 +43,10 @@ public class ControllerHandler {
                 String value = parameters.get(param.name());
                 if (param.required() && (null == value || value.trim().length() == 0)) {
                     return new Render("parameter " + param.name() + " is required", RenderType.TEXT, HttpResponseStatus.BAD_REQUEST);
-                } else if (null != value && value.trim().length() > 0) {
+                }
+                if (null != value && value.trim().length() > 0) {
                     try {
-                        Object realValue = type.isInstance(value) ? value : doConvert(value, type);
-                        parameterValues[i] = realValue;
+                        parameterValues[i] = doConvert(value, type);
                     } catch (Exception e) {
                         return new Render("wrong parameter value for type", RenderType.TEXT, HttpResponseStatus.BAD_REQUEST);
                     }
@@ -58,13 +59,58 @@ public class ControllerHandler {
         try {
             return (Render) method.invoke(controller, parameterValues);
         } catch (Throwable t) {
-            return new Render(t.getMessage(), RenderType.TEXT, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+            return Render.text(t.getMessage(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    public Render handle(Map<String, String> parameters, Map<String, List<String>> requestBody) {
-
-        return null;
+    public Render handle(Map<String, String> parameters, String requestBody) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        Annotation[][] annotations = method.getParameterAnnotations();
+        Object[] parameterValues = new Object[parameterTypes.length];
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class<?> type = parameterTypes[i];
+            Annotation[] annotation = annotations[i];
+            if (annotation == null || annotation.length == 0 || annotation[0] == null) {
+                parameterValues[i] = type.isPrimitive() ? primitiveDefaults.get(type) : null;
+            } else if (annotation[0] instanceof RequestParam) {
+                RequestParam param = (RequestParam) annotation[0];
+                String value = parameters.get(param.name());
+                if (param.required() && (null == value || value.trim().length() == 0)) {
+                    return new Render("parameter " + param.name() + " is required", RenderType.TEXT, HttpResponseStatus.BAD_REQUEST);
+                }
+                if (null != value && value.trim().length() > 0) {
+                    try {
+                        parameterValues[i] = type.isInstance(value) ? value : doConvert(value, type);
+                    } catch (Exception e) {
+                        return Render.text(e.getMessage(), HttpResponseStatus.BAD_REQUEST);
+                    }
+                } else {
+                    parameterValues[i] = type.isPrimitive() ? primitiveDefaults.get(type) : null;
+                }
+            } else if (annotation[0] instanceof RequestBody) {
+                if (((RequestBody) annotation[0]).required() && (requestBody == null || requestBody.length() == 0)) {
+                    return Render.text("request body is null", HttpResponseStatus.BAD_REQUEST);
+                }
+                if (type.isPrimitive()) {
+                    try {
+                        parameterValues[i] = doConvert(requestBody, type);
+                    } catch (Throwable t) {
+                        return Render.text(t.getMessage(), HttpResponseStatus.BAD_REQUEST);
+                    }
+                } else {
+                    try {
+                        parameterValues[i] = requestBody == null ? null : JSON.parseObject(requestBody, type);
+                    } catch (Throwable t) {
+                        return Render.text(t.getMessage(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
+                    }
+                }
+            }
+        }
+        try {
+            return (Render) method.invoke(controller, parameterValues);
+        } catch (Throwable t) {
+            return Render.text(t.getMessage(), HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public Object getController() {
@@ -76,6 +122,9 @@ public class ControllerHandler {
     }
 
     private Object doConvert(String value, Class<?> toType) {
+        if (null == value) {
+            return primitiveDefaults.get(toType);
+        }
         Object result = null;
         if ((toType == Integer.class) || (toType == Integer.TYPE))
             result = Integer.parseInt(value);

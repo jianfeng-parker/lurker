@@ -14,10 +14,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
-        <!--<dependency>-->
-        <!--<groupId>com.google.guava</groupId>-->
-        <!--<artifactId>guava</artifactId>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
@@ -25,12 +21,6 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>cn.ubuilding.lurker</groupId>
-            <artifactId>lurker-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

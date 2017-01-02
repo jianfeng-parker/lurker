@@ -11,8 +11,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RequestBody {
-
-    String name();
-
     boolean required() default true;
 }

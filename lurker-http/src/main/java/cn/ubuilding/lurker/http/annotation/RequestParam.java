@@ -12,7 +12,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface RequestParam {
 
-    // TODO 如果可以通过反射获取方法形式参数名，此处就无需开发者显示指定参数名
     String name();
 
     boolean required() default true;
