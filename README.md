@@ -1,9 +1,12 @@
 ## 基于Netty实现的网络通讯框架项目
 
-### ![alt text](lurker-rpc/README.md "RPC")
+### RPC
 
+* 见项目lurker-rpc
 
-### ![alt text](lurker-http/README.md "HTTP Server")
+### HTTP
+
+* 见项目lurker-http
 
 
 
