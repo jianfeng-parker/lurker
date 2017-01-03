@@ -1,4 +1,4 @@
-### 基于Netty实现的简易HTTP Server框架
+### 基于Netty实现的简易HTTP Server框架 [参考](https://github.com/caskdata/netty-http)
 
 > * 创建Server实例
 
