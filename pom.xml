@@ -13,6 +13,7 @@
     <modules>
         <module>lurker-rpc</module>
         <module>lurker-http</module>
+        <module>lurker-demo</module>
     </modules>
     <packaging>pom</packaging>
 
