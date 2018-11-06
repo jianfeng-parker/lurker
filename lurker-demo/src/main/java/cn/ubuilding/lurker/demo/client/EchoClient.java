@@ -47,6 +47,6 @@ public class EchoClient {
     }
 
     public static void main(String[] args) throws Exception {
-        new EchoClient("192.168.1.103", 8060).start();
+        new EchoClient("127.0.0.1", 8060).start();
     }
 }
